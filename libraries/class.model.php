@@ -141,9 +141,9 @@ abstract class Model
    {
     if($field !== $this->primary_key)
      {
-      if(!in_array($field, $this->fields))
+      if(in_array($field, $this->fields))
        {
-        throw new Model_Exception('El campo "'.$field.'" no se encuentra entre los campos predefinidos');
+        return $this->data[$field];
        }
       elseif(isset($this->data[$field]) === false)
        {
@@ -152,7 +152,7 @@ abstract class Model
        }
       else
        {
-        return $this->data[$field];
+        throw new Model_Exception('El campo "'.$field.'" no se encuentra entre los campos predefinidos');
        }
      }
     else
@@ -241,6 +241,23 @@ abstract class Model
     $this->id = $id;
     $this->load_data();
    } // final protected function set_id();
+
+
+
+  /**
+   * Seteamos el ID cargando los datos desde una columna ajena al $primary_key
+   * @param string $key Columna a utilizar.
+   * @param mixed $value Valor a consultar
+   * @return boolean
+   */
+  final public function set_id_by_key($key, $value)
+   {
+    $temp = $this->db->select($this->table, $this->primary_key, array($key, $value), 1);
+    if($temp !== false)
+     {
+      return $this->set_id($temp[$this->primary_key]);
+     }
+   }
 
 
 
