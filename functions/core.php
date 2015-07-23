@@ -69,29 +69,20 @@ function paginate($page, $limit)
  */
 function exception_handler($exception)
  {
-  echo '<div>
-   <h4>Fallo grave del sistema</h4>
-   <p><b>Tipo</b>: '.str_replace('_Exception', '', get_class($exception)).'</p>
-   <p><b>Mensaje</b>: '.$exception->getMessage().'</p>
-   <p><b>C&oacute;digo</b>: '.$exception->getCode().'</p>
-   <p><b>Archivo</b>: '.$exception->getFile().'</p>
-   <p><b>L&iacute;nea</b>: '.$exception->getLine().'</p>
-  </div>';
+  $debug = debug_backtrace();
+  foreach($debug as $track)
+   {
+    echo '<div>
+     <h4>Fallo grave del sistema</h4>
+     <p><b>Tipo</b>: '.str_replace('_Exception', '', get_class($exception)).'</p>
+     <p><b>Mensaje</b>: '.$exception->getMessage().'</p>
+     <p><b>Funci&oacute;n: </b>: '.$track['function'].'</p>
+     <p><b>Argumentos</b>: '.json_encode($track['args']).'</p>
+     <p><b>Archivo</b>: '.$exception->getFile().'</p>
+     <p><b>L&iacute;nea</b>: '.(isset($track['line']) ? $track['line'] : $exception->getLine()).'</p>
+    </div>';
+   }
  } // function exception_handler();
-
-
-
-/**
- * LDB: Improvisación para el manejo de errores
- * @param string $query Consulta que origina el error
- * @param string $error Mensaje de error provisto por el servidor MySQL
- * @return nothing
- * @author Cody Roodaka <roodakazo@gmail.com>
- */
-function ldb_handle_error($query, $error)
- {
-  exit('<h2>Database Error</h2>'.(($query !== '') ? '<span>Error en la consulta <i>'.$query.'</i></br>' : '').'<b>'.$error.'</b></span>');
- } // function ldb_error();
 
 
 
