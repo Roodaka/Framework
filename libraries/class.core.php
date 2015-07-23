@@ -32,12 +32,6 @@ final class Core
   public static $config = array();
 
   /**
-   * Datos de funcionamiento inicial
-   * @var array
-   */
-  public static $initial_data = array();
-
-  /**
    * Identificador del error.
    * @var integer
    */
@@ -104,7 +98,7 @@ final class Core
     * @param array $initial_data Arreglo con los datos (tiempo y RAM) iniciales
     * @return nothing
     */
-  public static function init($initial_data = null)
+  public static function init()
    {
     // Nos aseguramos de que sólo una vez se inicialice la clase
     if(self::$initialized === false)
@@ -113,37 +107,14 @@ final class Core
 
       self::$config = get_config('core');
 
-      if($initial_data !== null)
-       {
-        self::$initial_data = (array) $initial_data;
-       }
-
       self::$avaiable_controllers = get_config('routes');
+
+      self::$default_routing = array('controller' => self::$config['default_controller'], 'method' => self::$config['default_method']);
+      self::$error_routes = array('controller' => self::$config['error_controller'], 'method' => self::$config['error_method']);
 
       self::load_components();
 
-      // Asignamos las rutas predefinidas del sistema.
-      if(self::is_valid_route(self::$config['default_controller'], self::$config['default_method']) === true)
-       {
-        self::$default_routing = array(
-         'controller' => self::$config['default_controller'],
-         'method' => self::$config['default_method']);
-       }
-      else
-       {
-        throw new Core_Exception('La ruta predefinida es inv&aacute;lida.', self::$error);
-       }
-
-      if(self::is_valid_route(self::$config['error_controller'], self::$config['error_method']) === true)
-       {
-        self::$error_routes = array(
-         'controller' => self::$config['error_controller'],
-         'method' => self::$config['error_method']);
-       }
-      else
-       {
-        throw new Core_Exception('La ruta de fallos es inv&aacute;lida.'); // Master Error
-       }
+      Session::init();
 
       // Cargamos configuraciones del sitio y las preferencias del usuario
       //TODO: Crear el modelo de preferencias de usuario
@@ -175,11 +146,7 @@ final class Core
     if(isset($_GET[self::ROUTING_VALUE_VARIABLE]))
      {
       self::$target_routing['value'] = (int) $_GET[self::ROUTING_VALUE_VARIABLE];
-     }
-     
-    // Índice string para buscadores y otros
-    if(isset($_GET[self::ROUTING_VALUE_VARIABLE]))
-     {
+      // Índice string para buscadores y otros
       self::$target_routing['value_str'] = $_GET[self::ROUTING_VALUE_VARIABLE];
      }
 
@@ -345,7 +312,6 @@ final class Core
     load_component('Model');
     load_component('Controller');
     load_component('Session');
-    Session::init();
     load_component('View');
    } // private static function load_libraries();
 
