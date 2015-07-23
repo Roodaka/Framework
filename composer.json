@@ -1,0 +1,23 @@
+{
+    "name": "roodaka/framework",
+    "description": "Framework PHP",
+    "keywords": ["framework"],
+    "type": "project",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Cody Roodaka",
+            "email": "roodakazo@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.0",
+        "hautelook/phpass": "dev-master",
+        "rain/raintpl": ">=3.0.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+    }
+}
