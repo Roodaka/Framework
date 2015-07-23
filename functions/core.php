@@ -69,16 +69,19 @@ function paginate($page, $limit)
  */
 function exception_handler($exception)
  {
-  $trace = $exception->getTrace();
-  echo '<div>
-   <h4>Fallo grave del sistema</h4>
-   <p><b>Tipo</b>: '.str_replace('_Exception', '', get_class($exception)).'</p>
-   <p><b>Mensaje</b>: '.$exception->getMessage().'</p>
-   <p><b>Funci&oacute;n: </b>: '.$trace[0]['function'].'</p>
-   <p><b>Argumentos</b>: '.json_encode($track[0]['args']).'</p>
-   <p><b>Archivo</b>: '.$exception->getFile().'</p>
-   <p><b>L&iacute;nea</b>: '.(isset($trace[0]['line']) ? $track[0]['line'] : $exception->getLine()).'</p>
-  </div>';
+  $debug = debug_backtrace();
+  foreach($debug as $track)
+   {
+    echo '<div>
+     <h4>Fallo grave del sistema</h4>
+     <p><b>Tipo</b>: '.str_replace('_Exception', '', get_class($exception)).'</p>
+     <p><b>Mensaje</b>: '.$exception->getMessage().'</p>
+     <p><b>Funci&oacute;n: </b>: '.$track['function'].'</p>
+     <p><b>Argumentos</b>: '.json_encode($track['args']).'</p>
+     <p><b>Archivo</b>: '.$exception->getFile().'</p>
+     <p><b>L&iacute;nea</b>: '.(isset($track['line']) ? $track['line'] : $exception->getLine()).'</p>
+    </div>';
+   }
  } // function exception_handler();
 
 
