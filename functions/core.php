@@ -34,7 +34,22 @@ function load_component($target)
    }
   else
    {
-    throw new Exception('');
+    throw new \Framework\Core_Exception('cannot_load_component('.$target.')');
+   }
+ }
+
+ function load_util($target)
+ {
+  if(!class_exists($target))
+   {
+    if(is_file(UTILS_LIBS.'class.'.strtolower($target).EXT) === true)
+     {
+      require_once(UTILS_LIBS.'class.'.strtolower($target).EXT);
+     }
+    else
+     {
+      throw new \Framework\Core_Exception('cannot_load_util('.$target.')');
+     }
    }
  }
 
@@ -56,7 +71,13 @@ function load_model($model, $id = null, $specified_fields = null, $autoload = tr
  */
 function paginate($page, $limit)
  {
-  return array((($page - 1) * $limit), ($page * $limit));
+  if($page === 1) { $return = array(0, $limit); }
+  else
+   {
+    $start = (($page - 1) * $limit);
+    $return = array($start, ($start + $limit));
+   }
+  return $return; 
  } // function paginate();
 
 
@@ -69,31 +90,23 @@ function paginate($page, $limit)
  */
 function exception_handler($exception)
  {
-  $debug = debug_backtrace();
-  foreach($debug as $track)
-   {
-    echo '<div>
-     <h4>Fallo grave del sistema</h4>
-     <p><b>Tipo</b>: '.str_replace('_Exception', '', get_class($exception)).'</p>
-     <p><b>Mensaje</b>: '.$exception->getMessage().'</p>
-     <p><b>Funci&oacute;n: </b>: '.$track['function'].'</p>
-     <p><b>Argumentos</b>: '.json_encode($track['args']).'</p>
-     <p><b>Archivo</b>: '.$exception->getFile().'</p>
-     <p><b>L&iacute;nea</b>: '.(isset($track['line']) ? $track['line'] : $exception->getLine()).'</p>
-    </div>';
-   }
+  echo '<div>
+   <h4>'.str_replace('_Exception', '', get_class($exception)).' Error: '.$exception->getMessage().'</h4>
+   <p><b>File</b>: '.str_replace(ROOT, '', $exception->getFile()).'</p>
+   <p><b>Trace</b>: '.str_replace(ROOT, '', $exception->getTraceAsString()).'</p>
+  </div>';
  } // function exception_handler();
 
 
 
 function get_config($file)
  {
-  return require_once(CONFIGURATIONS_DIR.$file.EXT);
+  return require_once(CONFIGURATIONS_DIR.strtolower($file).EXT);
  }
 
 
 
-function get_routing_controller() { return Framework\Core::$target_routing['controller']; }
-function get_routing_method() { return Framework\Core::$target_routing['method']; }
-function get_routing_value() { return Framework\Core::$target_routing['value']; }
-function get_routing_page() { return Framework\Core::$target_routing['page']; }
+function get_routing_controller() { return \Framework\Core::$target_routing['controller']; }
+function get_routing_method() { return \Framework\Core::$target_routing['method']; }
+function get_routing_value() { return \Framework\Core::$target_routing['value']; }
+function get_routing_page() { return \Framework\Core::$target_routing['page']; }
