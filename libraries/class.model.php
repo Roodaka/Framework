@@ -21,6 +21,12 @@ abstract class Model
   public $id = null;
 
   /**
+   * Instancia de LittleDB
+   * @var LittleDB
+   */
+  protected $db = null;
+
+  /**
    * Arreglo asosiativo con los campos y valores cargados en el constructor
    * @var array
    */
@@ -70,6 +76,7 @@ abstract class Model
    */
   public function __construct($id = null, $specified_fields = null, $autoload = true)
    {
+    $this->db = LittleDB::get_instance();
     $this->specified_fields = $specified_fields;
     $this->id = $id;
 
@@ -109,7 +116,7 @@ abstract class Model
         // forma insertamos
         if($this->id !== null)
          {
-          return LDB::update($this->table, $fields, array($this->primary_key => $this->id));
+          return $this->db->update($this->table, $fields, array($this->primary_key => $this->id));
          }
         else
          {
@@ -140,7 +147,7 @@ abstract class Model
        }
       elseif(isset($this->data[$field]) === false)
        {
-        $query = LDB::select($this->table, $field, array($this->primary_key => $this->id));
+        $query = $this->db->select($this->table, $field, array($this->primary_key => $this->id));
         return ($query !== false) ? $query[$field] : false;
        }
       else
@@ -199,7 +206,7 @@ abstract class Model
    */
   protected function load_data()
    {
-    $temp = LDB::select($this->table, (($this->specified_fields === null) ? $this->fields : array_intersect($this->specified_fields, $this->fields)), array($this->primary_key => $this->id));
+    $temp = $this->db->select($this->table, (($this->specified_fields === null) ? $this->fields : array_intersect($this->specified_fields, $this->fields)), array($this->primary_key => $this->id));
     if($temp !== false)
      {
       $this->data = $temp;
@@ -245,7 +252,7 @@ abstract class Model
    */
   final public function set_id_by_key($key, $value)
    {
-    $temp = LDB::select($this->table, $this->primary_key, array($key, $value), 1);
+    $temp = $this->db->select($this->table, $this->primary_key, array($key, $value), 1);
     if($temp !== false)
      {
       return $this->set_id($temp[$this->primary_key]);
@@ -307,7 +314,7 @@ abstract class Model
    */
   final public function save()
    {
-    $id = LDB::insert($this->table, $this->data);
+    $id = $this->db->insert($this->table, $this->data);
     if(is_int($id) === true)
      {
       $this->id = $id;
@@ -325,10 +332,7 @@ abstract class Model
   /**
    * Requerimos que cada modelo se pueda borrar a sí mismo
    */
-  protected function delete()
-   {
-    return LDB::delete($this->table, array($this->primary_key => $this->id));
-   }
+  abstract protected function delete();
  } // class Model();
 
 /**

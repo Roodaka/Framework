@@ -29,7 +29,7 @@ class Example extends F\Model
   public function get_by_name($order = 'ASC', $page = 1, $limit = 10)
    {
     $limits = paginate($page, $limit);
-    $query = F\LDB::query('SELECT '.$this->primary_key.' FROM '.$this->table.' ORDER BY name '.$order.' LIMIT '.$limits[0].', '.$limits[1]);
+    $query = $this->db->query('SELECT '.$this->primary_key.' FROM '.$this->table.' ORDER BY name '.$order.' LIMIT '.$limits[0].', '.$limits[1]);
     if($query !== false)
      {
       $ids = array();
@@ -39,5 +39,11 @@ class Example extends F\Model
        }
       return $ids;
      }
+   }
+
+
+  protected function delete()
+   {
+    return $this->db->delete($this->table, array($this->primary_key => $this->id));
    }
  } // class User();

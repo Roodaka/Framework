@@ -76,11 +76,6 @@ final class View
 
 
 
-  public static function set_lang($lang)
-   {
-    self::$configuration['lang'] = $lang; 
-   }
-
 
   /**
    * Agregar una nueva plantilla para mostrar
@@ -99,14 +94,17 @@ final class View
    * @param string $lang Idioma forzado
    * @return array
    */
-  private static function load_language($lang = 'spanish')
+  private static function load_language($lang = null)
    {
-    $directory = VIEWS_DIR.'languages'.DS;
+
+    $directory = VIEWS_DIR.'languages'.DS.strtolower($lang).DS;
     if(is_dir($directory) === true)
      {
-      if(is_file($directory.strtolower($lang).'.json'))
+      if(is_file($directory.'main.json'))
        {
-        $result = json_decode(file_get_contents($directory.strtolower($lang).'.json'), true);
+        $result = array();
+        $result += json_decode(file_get_contents($directory.'main.json'), true);
+
         if(count(self::$files['lang']) >= 1)
          {
           foreach(self::$files['lang'] as $file)
@@ -114,7 +112,6 @@ final class View
             if(is_file($directory.$file.'.json'))
              {
               $result += json_decode(file_get_contents($directory.$file.'.json'), true);
-              
              }
             else
              {
