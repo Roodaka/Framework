@@ -44,18 +44,20 @@ final class Context
          }
        }
      }
-
-    if(array_key_exists($function, self::$callbacks) === true)
-     {
-      return call_user_func_array((array) self::$callbacks[$function][0], (($forced_arguments !== null AND is_array($forced_arguments)) ? (array) $forced_arguments : (array) self::$callbacks[$function][1] ));
-     }
-    elseif($function === null)
-     {
-      return true;
-     }
     else
      {
-      throw new Context_Exception('Se intenta consultar un contexto inexistente ('.$function.').');
+      if(array_key_exists($function, self::$callbacks) === true)
+       {
+        return call_user_func_array((array) self::$callbacks[$function][0], (($forced_arguments !== null AND is_array($forced_arguments)) ? (array) $forced_arguments : (array) self::$callbacks[$function][1] ));
+       }
+      elseif($function === null)
+       {
+        return true;
+       }
+      else
+       {
+        throw new Context_Exception('Se intenta consultar un contexto inexistente ('.$function.').');
+       }
      }
    } // public static function check();
 
