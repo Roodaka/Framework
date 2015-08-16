@@ -14,12 +14,6 @@ defined('ROOT') or exit('No tienes Permitido el acceso.');
 final class Core
  {
   /**
-   * Constancia de instanciación
-   * @var boolean
-   */
-  private static $initialized = false;
-
-  /**
    * Arreglo de Controladores disponibles.
    * @var array
    */
@@ -45,7 +39,7 @@ final class Core
    'controller' => null,
    'method' => null,
    'value' => null,
-   'page' => null);
+   'page' => 1);
 
   /**
    * Ruta por defecto
@@ -55,7 +49,7 @@ final class Core
    'controller' => null,
    'method' => null,
    'value' => null,
-   'page' => null);
+   'page' => 1);
 
   /**
    * Ruta actual
@@ -65,7 +59,7 @@ final class Core
    'controller' => null,
    'method' => null,
    'value' => null,
-   'page' => null);
+   'page' => 1);
 
   /**
    * Ruta solicitada para redireccionamiento.
@@ -75,8 +69,7 @@ final class Core
    'controller' => null,
    'method' => null,
    'value' => null,
-   'value_str' => null,
-   'page' => null);
+   'page' => 1);
 
   // Constantes que definen los errores en la carga del controlador
   const ROUTING_ERROR_CONTEXT = 'routing_error_context';
@@ -100,26 +93,17 @@ final class Core
     */
   public static function init()
    {
-    // Nos aseguramos de que sólo una vez se inicialice la clase
-    if(self::$initialized === false)
-     {
-      self::$initialized = true;
+    self::$config = get_config('core');
 
-      self::$config = get_config('core');
+    self::$avaiable_controllers = get_config('routes');
 
-      self::$avaiable_controllers = get_config('routes');
+    self::$default_routing = array('controller' => self::$config['default_controller'], 'method' => self::$config['default_method']);
+    self::$error_routes = array('controller' => self::$config['error_controller'], 'method' => self::$config['error_method']);
 
-      self::$default_routing = array('controller' => self::$config['default_controller'], 'method' => self::$config['default_method']);
-      self::$error_routes = array('controller' => self::$config['error_controller'], 'method' => self::$config['error_method']);
-
-      self::load_components();
-
-      Session::init();
-
-      // Cargamos configuraciones del sitio y las preferencias del usuario
-      //TODO: Crear el modelo de preferencias de usuario
-      self::route();
-     }
+    self::load_components();
+    // Cargamos configuraciones del sitio y las preferencias del usuario
+    //TODO: Crear el modelo de preferencias de usuario
+    self::route();
    } // public static function init();
 
 
@@ -145,9 +129,7 @@ final class Core
     // Índice
     if(isset($_GET[self::ROUTING_VALUE_VARIABLE]))
      {
-      self::$target_routing['value'] = (int) $_GET[self::ROUTING_VALUE_VARIABLE];
-      // Índice string para buscadores y otros
-      self::$target_routing['value_str'] = $_GET[self::ROUTING_VALUE_VARIABLE];
+      self::$target_routing['value'] = $_GET[self::ROUTING_VALUE_VARIABLE];
      }
 
     // Página
@@ -182,21 +164,25 @@ final class Core
    * Cargamos el controlador objetivo del router.
    * @return nothing
    */
-  private static function call_controller()
+  private static function call_controller($controller = null, $method = null, $value = null, $page = 1, $ignore_post = false)
    {
     // Si hubo un error, llamamos al controlador correspondiente
     if(self::$error !== null)
      {
       self::$target_routing = self::$error_routes;
      }
+    elseif($controller !== null)
+     {
+      $method = $method !== null ? $method : self::$default_routing['method'];
+      self::$target_routing = array('controller' => $controller, 'method' => $method, 'value' => $value, 'page' => $page);
+     }
 
     // DESPUÉS DE TODO ESTO, CARGAMOS EL CONTROLADOR!!!
     require_once(CONTROLLERS_DIR.'class.'.strtolower(self::$target_routing['controller']).EXT);
 
     // Hacemos la última validación.
-
     $class = '\Framework\Controllers\\'.self::$target_routing['controller'];
-    $controller = new $class();
+    $controller = new $class($ignore_post);
     if(get_parent_class($controller) === 'Framework\Controller')
      {
       call_user_func_array(array($controller, self::$target_routing['method']), array());
@@ -218,7 +204,7 @@ final class Core
       self::$target_routing = self::$new_routing;
 
       // anulamos la redirección
-      self::$new_routing = array('controller' => null, 'method' => null, 'value' => null, 'page' => null);
+      self::$new_routing = array('controller' => null, 'method' => null, 'value' => null, 'page' => 1);
 
       // Reiniciamos las vistas.
       View::clear();
@@ -227,7 +213,7 @@ final class Core
       Factory::clear();
 
       // Llamamos a esta misma función para continuar el proceso.
-      self::call_controller(self::$new_routing['controller'], self::$new_routing['method']);
+      self::call_controller(self::$target_routing['controller'], self::$target_routing['method'], self::$target_routing['value'], self::$target_routing['page'], true);
      }
    } // private static function call_controller();
 
@@ -242,7 +228,7 @@ final class Core
    * @param boolean $http_redirection Solicitar una redirección HTTP o no
    * @return nothing
    */
-  public static function redirect($controller, $method = null, $value = null, $page = null, $http_redirection = true)
+  public static function redirect($controller, $method = null, $value = null, $page = 1, $http_redirection = true)
    {
     if(self::is_valid_route($controller, $method) === true)
      {
@@ -304,7 +290,8 @@ final class Core
   private static function load_components()
    {
     // Precarga de LittleDB para su próximo uso por los modelos.
-    load_component('LittleDB');
+    load_component('LDB');
+    LDB::init();
     // load_component('Cache');
     load_component('Controller');
     load_component('Context');
@@ -312,8 +299,9 @@ final class Core
     load_component('Model');
     load_component('Controller');
     load_component('Session');
+    Session::init();
     load_component('View');
-   } // private static function load_libraries();
+   } // private static function load_components();
 
  } // final class Core();
 

@@ -7,9 +7,8 @@ if(DEV === true)
  {
   error_reporting(E_ALL);
   ini_set('display_errors', true);
-  $start = array(
-   'time' => microtime(true),
-   'ram' => memory_get_usage());
+  define('SYSTEM_INIT_TIME', microtime(true));
+  define('SYSTEM_INIT_RAM', memory_get_usage());
  }
 else
  {
@@ -40,4 +39,4 @@ require(FUNCTIONS_DIR.'friendly'.EXT);
 
 // Cargamos e iniciamos el núcleo.
 load_component('Core');
-\Framework\Core::init($start);
+\Framework\Core::init();
