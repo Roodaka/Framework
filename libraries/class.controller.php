@@ -25,37 +25,25 @@ abstract class Controller
 
 
 
-  public function __construct()
+  public function __construct($ignore_post = false)
    {
-    if($_SERVER['REQUEST_METHOD'] === 'POST')
+    if($ignore_post === false)
      {
-      $this->post = (array) $_POST;
-      $this->post = $this->filterEntities($this->post);
-      $this->post_count = count($_POST);
+      if($_SERVER['REQUEST_METHOD'] === 'POST')
+       {
+        $this->is_post = true;
+        $this->post = (array) $_POST;
+        $this->post_count = count($_POST);
+       }
+      if(isset($_FILES) === true)
+       {
+        $this->has_files = true;
+        $this->files = (array) $_FILES;
+        $this->files_count = count($_FILES);
+       }
      }
-
-    if(isset($_FILES) === true)
-     {
-      $this->has_files = true;
-      $this->files = (array) $_FILES;
-      $this->files_count = count($_FILES);
-     }
-
     $this->build_header();
    } // protected function __construct();
-   
-   private function filterEntities($array)
-   {
-    
-     foreach($array as $key => $valor)
-     {
-       $array[$key] = str_replace('<br />','[br]',nl2br(htmlentities($valor)));
-     }
-     return $array;
-    
-   }
-
-
 
   /**
    * Convertimos la clase una cadena
@@ -75,7 +63,7 @@ abstract class Controller
   public function __invoke()
    {
     return $this->main();
-   } // protected function __invoke();
+   } // public function __invoke();
 
 
 
@@ -95,7 +83,7 @@ abstract class Controller
    * controlador. Debe llamarse antes del método Main();
    * @return nothing
    */
-  abstract protected function build_header(); // abstract protected function build_header();
+  public function build_header() {} // abstract protected function build_header();
 
 
 
