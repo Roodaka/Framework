@@ -92,16 +92,16 @@ function exception_handler($exception)
  {
   echo '<div>
    <h4>'.str_replace('_Exception', '', get_class($exception)).' Error: '.$exception->getMessage().'</h4>
-   <p><b>File</b>: '.str_replace(ROOT, '', $exception->getFile()).'</p>
-   <p><b>Trace</b>: '.str_replace(ROOT, '', $exception->getTraceAsString()).'</p>
+   <p><b>File</b>: '.str_replace(ROOT, 'HOME_DIR'.DS, $exception->getFile()).'</p>
+   <p><b>Trace</b>: '.str_replace(ROOT, 'HOME_DIR'.DS, $exception->getTraceAsString()).'</p>
   </div>';
  } // function exception_handler();
 
 
 
-function get_config($file)
+function get_config($target, $field = null)
  {
-  return require_once(CONFIGURATIONS_DIR.strtolower($file).EXT);
+  return Framework\Configuration::get($target, $field);
  }
 
 

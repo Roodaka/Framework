@@ -37,6 +37,7 @@ set_exception_handler('exception_handler');
 
 require(FUNCTIONS_DIR.'friendly'.EXT);
 
+load_component('Configuration');
 // Cargamos e iniciamos el núcleo.
 load_component('Core');
 \Framework\Core::init();
