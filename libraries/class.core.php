@@ -271,10 +271,7 @@ final class Core
        {
         if(isset(self::$avaiable_controllers[$controller][$method]) === true)
          {
-          if(Context::check(self::$avaiable_controllers[$controller][$method][0], self::$avaiable_controllers[$controller][$method][1]) === true)
-           {
-            self::$error = null;
-           } else { self::$error = self::ROUTING_ERROR_CONTEXT; }
+          self::$error = null;
          } else { self::$error = self::ROUTING_ERROR_METHOD; }
        } else { self::$error = self::ROUTING_ERROR_CONTROLLER; }
      } else { self::$error = self::ROUTING_ERROR_FILE; }
@@ -292,9 +289,7 @@ final class Core
     // Precarga de LittleDB para su próximo uso por los modelos.
     load_component('LDB');
     LDB::init();
-    // load_component('Cache');
     load_component('Controller');
-    load_component('Context');
     load_component('Factory');
     load_component('Model');
     load_component('Controller');
@@ -302,7 +297,6 @@ final class Core
     Session::init();
     load_component('View');
    } // private static function load_components();
-
  } // final class Core();
 
 

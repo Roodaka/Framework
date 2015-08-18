@@ -1,6 +1,6 @@
   <div class="footer">
    {if="DEV === true"}
-    <b>{$lang.dev_time}</b>: {function="round(microtime(true) - SYSTEM_INIT_TIME, 4)"} <b>{$lang.dev_ram}</b>: {function="((memory_get_usage() - SYSTEM_INIT_RAM) / 1024)"}kb <b>{$lang.dev_sql}</b>: {function="Framework\LDB::$count"}  <b>{$lang.dev_context}</b>: {function="Framework\Context::$count"}
+    <b>{$lang.dev_time}</b>: {function="round(microtime(true) - SYSTEM_INIT_TIME, 4)"} <b>{$lang.dev_ram}</b>: {function="((memory_get_usage() - SYSTEM_INIT_RAM) / 1024)"}kb <b>{$lang.dev_sql}</b>: {function="Framework\LDB::$count"}
    {/if}
   </div>
   <script src="views/html/js/base.js"></script>

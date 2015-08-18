@@ -38,7 +38,7 @@ final class Configuration
 
 
   /**
-   * Llamamos a la función definitoria del contexto.
+   * Obtenemos un arreglo de configuraciones
    * @param string $name Nombre de la configuración a cargar
    * @param string $field Campo específico a cargar de esa configuración.
    * @return boolean
