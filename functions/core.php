@@ -30,25 +30,44 @@ function load_component($target)
  {
   if(!class_exists($target))
    {
-    require_once(LIBRARIES_DIR.'class.'.strtolower($target).EXT);
-   }
-  else
-   {
-    throw new \Framework\Core_Exception('cannot_load_component('.$target.')');
-   }
- }
-
- function load_util($target)
- {
-  if(!class_exists($target))
-   {
-    if(is_file(UTILS_LIBS.'class.'.strtolower($target).EXT) === true)
+    if(is_file(LIBRARIES_DIR.'class.'.strtolower($target).EXT) === true)
      {
-      require_once(UTILS_LIBS.'class.'.strtolower($target).EXT);
+      require_once(LIBRARIES_DIR.'class.'.strtolower($target).EXT);
      }
     else
      {
-      throw new \Framework\Core_Exception('cannot_load_util('.$target.')');
+      throw new \Framework\Core_Exception('No se encuentra el componente '.$target);
+     }
+   }
+ }
+
+function load_util($target)
+ {
+  if(!class_exists($target))
+   {
+    if(is_file(LIBRARIES_DIR.'utils'.DS.'class.'.strtolower($target).EXT) === true)
+     {
+      require_once(LIBRARIES_DIR.'utils'.DS.'class.'.strtolower($target).EXT);
+     }
+    else
+     {
+      throw new \Framework\Core_Exception('No se encuentra la clase utilitaria '.$target);
+     }
+   }
+ }
+
+
+function load_third_party($target)
+ {
+  if(!class_exists($target))
+   {
+    if(is_file(LIBRARIES_DIR.'third_party'.DS.'class.'.strtolower($target).EXT) === true)
+     {
+      require_once(LIBRARIES_DIR.'third_party'.DS.'class.'.strtolower($target).EXT);
+     }
+    else
+     {
+      throw new \Framework\Core_Exception('No se encuentra la clase de terceros'.$target);
      }
    }
  }
@@ -91,7 +110,7 @@ function paginate($page, $limit)
 function exception_handler($exception)
  {
   echo '<div>
-   <h4>'.str_replace('_Exception', '', get_class($exception)).' Error: '.$exception->getMessage().'</h4>
+   <h4>'.str_replace('Framework\\', '', str_replace('_Exception', '', get_class($exception))).' Error: '.$exception->getMessage().'</h4>
    <p><b>File</b>: '.str_replace(ROOT, 'HOME_DIR'.DS, $exception->getFile()).'</p>
    <p><b>Trace</b>: '.str_replace(ROOT, 'HOME_DIR'.DS, $exception->getTraceAsString()).'</p>
   </div>';
