@@ -135,7 +135,7 @@ final class Factory
 
     return $classes;
    } // final public static function create_from_array();
- } // final class Factory Extends Component();
+ } // final class Factory();
 
 /**
  * Excepción única del componente Factory

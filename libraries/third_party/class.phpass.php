@@ -1,7 +1,6 @@
 <?php
 
-namespace Third_Party;
-
+namespace Framework\Third_Party;
 defined('ROOT') or exit('No tienes Permitido el acceso.');
 
 class PHPass {
