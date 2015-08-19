@@ -118,21 +118,20 @@ final class View
              }
             else
              {
-              throw new View_Exception('El archivo de idiomas ('.$directory.$file.'.json) no existe.');
+              throw new View_Exception('El archivo de idiomas '.$directory.$file.'.json no existe.');
              }
            }
          }
-
         return $result;
        }
       else
        {
-        throw new View_Exception('El archivo principal de idiomas ('.$directory.'main.json) no existe.');
+        throw new View_Exception('El archivo principal de idiomas '.$directory.$lang.'.json no existe.');
        }
      }
     else
      {
-      throw new View_Exception('El directorio de idiomas \''.$directory.'\' no existe.');
+      throw new View_Exception('El directorio de idiomas '.$directory.' no existe.');
      }
    }
 
@@ -168,19 +167,15 @@ final class View
 
       self::add_key('site', get_config('site'));
       self::add_key('core_files', self::$files);
-      self::add_key('core_paths', array(
-       'theme' => $dir_theme,
-       'base' => $dir_base));
-      self::add_key('site', get_config('site'));
 
       // Instanciamos RainTPL
-      require(THIRD_PARTY_LIBS_DIR.'class.raintpl.php');
+      load_third_party('raintpl');
       $rain = new Third_Party\RainTPL();
 
       // Configuramos Rain para trabajar
       Third_Party\raintpl::configure('base_url', $_SERVER['SERVER_NAME'].$dir_base);
       Third_Party\raintpl::configure('tpl_dir', 'views'.DS.'html'.DS);
-      Third_Party\raintpl::configure('cache_dir', CACHE_DIR.'html'.DS);
+      Third_Party\raintpl::configure('cache_dir', VIEWS_DIR.'cached'.DS);
 
       $rain->assign('lang', self::load_language(self::$configuration['lang']));
       $rain->assign(self::$variables);
