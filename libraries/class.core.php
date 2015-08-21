@@ -36,8 +36,8 @@ final class Core
    * @var array
    */
   protected static $error_routes = array(
-   'controller' => null,
-   'method' => null,
+   'controller' => 'error',
+   'method' => 'main',
    'value' => null,
    'page' => 1);
 
@@ -98,7 +98,6 @@ final class Core
     self::$avaiable_controllers = get_config('routes');
 
     self::$default_routing = array('controller' => self::$config['default_controller'], 'method' => self::$config['default_method']);
-    self::$error_routes = array('controller' => self::$config['error_controller'], 'method' => self::$config['error_method']);
 
     self::load_components();
     // Cargamos configuraciones del sitio y las preferencias del usuario
@@ -265,17 +264,23 @@ final class Core
    {
     $controller = strtolower($controller);
     $method = ($method === null) ? self::$default_routing['method'] : $method;
-    if(is_file(CONTROLLERS_DIR.'class.'.$controller.EXT))
+
+    if(isset(self::$avaiable_controllers[$controller]) === false)
      {
-      if(isset(self::$avaiable_controllers[$controller]))
-       {
-        if(isset(self::$avaiable_controllers[$controller][$method]) === true)
-         {
-          self::$error = null;
-         } else { self::$error = self::ROUTING_ERROR_METHOD; }
-       } else { self::$error = self::ROUTING_ERROR_CONTROLLER; }
-     } else { self::$error = self::ROUTING_ERROR_FILE; }
-    return self::$error !== null ? false : true;
+      throw new Core_Exception('El controlador '.$controller.' no se encuentra en la lista de rutas.');
+     }
+
+    if(isset(self::$avaiable_controllers[$controller][$method]) === false)
+     {
+      throw new Core_Exception('El m&eacute;todo indicado ('.$controller.'->'.$method.') no existe en la lista de rutas.');
+     }
+
+    if(is_file(CONTROLLERS_DIR.'class.'.$controller.EXT) === false)
+     {
+      throw new Core_Exception('El archivo de controlador '.$controller.' no existe.');
+     }
+
+    return true;
    } // private static function is_valid_route();
 
 
