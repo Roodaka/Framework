@@ -1,6 +1,6 @@
 /views/cached/*
-/configuration/database.php
-/configuration/session.php
+/configurations/database.php
+/configurations/session.php
 /robots.txt
 /framework.komodoproject
 /framework_old_libraries/*
