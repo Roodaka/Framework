@@ -24,19 +24,19 @@ abstract class Model
    * Arreglo asosiativo con los campos y valores cargados en el constructor
    * @var array
    */
-  public $data = array();
+  protected $data = array();
 
   /**
    * Tabla objetivo
    * @var string
    */
-  protected $table = '';
+  public $table = '';
 
   /**
    * Nombre del campo primario, generalmente ID
    * @var string
    */
-  protected $primary_key = '';
+  public $primary_key = '';
 
   /**
    * Lista de campos pertenecientes a este objeto
@@ -48,7 +48,7 @@ abstract class Model
    * Arreglo asosiativo con los campos modificados
    * @var array
    */
-  public $modified_fields = array();
+  protected $modified_fields = array();
 
   /**
    * Lista de campos pertenecientes a este objeto

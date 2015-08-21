@@ -135,6 +135,45 @@ final class Factory
 
     return $classes;
    } // final public static function create_from_array();
+
+
+
+  /**
+   * Realizamos una consulta rápida a la base de datos para obtener ID's u objetos
+   * @param string $model Nombre del modelo a cargar.
+   * @param null|array $condition Condicionantes para la consulta MySQL
+   * @param null|array $order Valor para el ordenado de los resultados
+   * @param null|array $limits Límites de otención
+   * @param boolean $autoload Autocargamos los datos
+   * @param boolean $return_array Solicitamos los datos como un arreglo
+   * @return nothing
+   */
+  final public static function create_from_database($model = null, $condition = null, $order = null, $limits = null, $autoload = true, $return_array = true)
+   {
+    $object = self::create($model);
+    $query = LDB::select($object->table, $object->primary_key, $condition, $order, $limits);
+    if($query !== false)
+     {
+      $result = array();
+      while($row = $query->fetch())
+       {
+        if($autoload === true)
+         {
+          $temp = self::create($model, $row[$object->primary_key]);
+          $result[] = ($return_array === true) ? $temp->get_array() : $temp;
+         }
+        else
+         {
+          $result[] = $row[$object->primary_key];
+         }
+       }
+      return $result;
+     }
+    else
+     {
+      return false;
+     }
+   }
  } // final class Factory();
 
 /**

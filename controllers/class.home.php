@@ -19,11 +19,7 @@ class Home Extends F\Controller
 
   public function main()
    {
-    $model = load_model('Example');
-
-    $array = (array) $model->get_by_name();
-
-    $result = F\Factory::create_from_array($array, 'Example', null, true, true);
+    $result = F\Factory::create_from_database('Example', null, 'name', 10, true);
 
     F\View::add_key('users', $result);
 
@@ -44,7 +40,6 @@ class Home Extends F\Controller
        {
         $user->name = $this->post['name'];
         $user->lastname = $this->post['lastname'];
-
         return F\Core::redirect('home', 'main');
        }
       else

@@ -10,12 +10,12 @@ class Example extends F\Model
    * Tabla objetivo
    * @var string
    */
-  protected $table = 'example';
+  public $table = 'example';
   /**
    * Nombre del campo primario, generalmente ID
    * @var string
    */
-  protected $primary_key = 'id';
+  public $primary_key = 'id';
 
   /**
    * Lista de campos pertenecientes a este objeto
@@ -26,18 +26,5 @@ class Example extends F\Model
    'lastname',
    'datetime');
 
-  public function get_by_name($order = 'ASC', $page = 1, $limit = 10)
-   {
-    $limits = paginate($page, $limit);
-    $query = F\LDB::query('SELECT '.$this->primary_key.' FROM '.$this->table.' ORDER BY name '.$order.' LIMIT '.$limits[0].', '.$limits[1]);
-    if($query !== false)
-     {
-      $ids = array();
-      while($id = $query->fetch())
-       {
-        $ids[] = (int) $id[$this->primary_key];
-       }
-      return $ids;
-     }
-   }
+
  } // class User();
