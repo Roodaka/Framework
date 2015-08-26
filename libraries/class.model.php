@@ -76,7 +76,7 @@ abstract class Model
     if($this->id !== null && $autoload === true)
      {
       return $this->load_data();
-     }
+     } 
    } // public function __construct();
 
 
@@ -193,6 +193,12 @@ abstract class Model
 
 
 
+  final public function is_empty()
+   {
+    return empty($this->data);
+   }
+  
+  
   /**
    * Cargamos los datos desde la base de datos
    * @return boolean

@@ -139,18 +139,17 @@ class LDB
    * @param array|integer $limit Límite de filas
    * @return array
    */
-  public static function select($table, $fields, $condition = null, $limit = null)
+  public static function select($table, $fields, $condition = null, $order = null, $limits = null)
    {
-    $cons = 'SELECT '.(is_array($fields) ? implode(', ', $fields) : $fields).' FROM '.self::$data['name'].'.'.self::$data['prefix'].$table.' '.self::parse_where($condition).' LIMIT '.(($limit !== null) ? ((is_array($limit)) ? $limit[0].', '.$limit[1] : '0, '.$limit) : '0, 1');
+    $cons = 'SELECT '.(is_array($fields) ? implode(', ', $fields) : $fields).' FROM '.self::$data['name'].'.'.self::$data['prefix'].$table.' '.self::parse_where($condition).' '.self::parse_order($order).' '.self::parse_limits($limits);
     $query = self::do_query($cons);
     if(!$query || $query == false)
      {
-      self::error($cons);
-      return false;
+     return false;
      }
     else
      {
-      if($limit !== null && $limit > 1)
+      if((int) $limits > 1 || is_array($limits))
        {
         return new \Framework\Query($cons, self::$conn);
         ++self::$count;
@@ -300,6 +299,40 @@ class LDB
      {
       return '';
      }
+   }
+
+
+
+  /**
+   * Parseo de Límites de consulta.
+   * @param integer|array $limits Número de filas o arreglo de paginado.
+   */
+  private static function parse_limits($limits = null)
+   {
+    $parsed = '';
+    if($limits !== null)
+     {
+      if(!is_array($limits))
+       {
+        $parsed = 'LIMIT 0, '.$limits;
+       }
+      else
+       {
+        $parsed = 'LIMIT '.$limits[0].', '.$limits[1];
+       }
+     }
+    return $parsed;
+   }
+
+
+
+  /**
+   * Parseo de ordenado de una consulta.
+   * @param integer|array $order Orden indicado.
+   */
+  private static function parse_order($order = null)
+   {
+    return ($order !== null) ? $order : '';
    }
 
 
