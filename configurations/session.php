@@ -1,6 +1,19 @@
 <?php defined('ROOT') or exit('No tienes Permitido el acceso.');
 return array(
- 'session_table' => '',
+ 'mysql' => array(
+  'table' => '',
+  'field_hash' => '',
+  'field_user' => '',
+  'field_time' => '',
+  'field_cookies' => ''
+  ),
+
+ 'duration' => 604800, // one week.
+ 'algorithm' => 'sha256',
+
+ 'user_object' => null,
+ 'user_fields' => null,
+
  'duration' => 604800,
  'algorithm' => 'md5',
  'user_object' => null,

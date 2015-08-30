@@ -20,127 +20,89 @@ final class Session
   protected static $configuration = array();
 
   /**
+   * Hash identificador de la sesión
+   * @var string
+   */
+  private static $hash = null;
+
+  /**
    * Objeto de usuario a gestionar
    * var Object
    */
   public static $user = null;
 
-
-  const SUCCESS = 1;
-  const ERROR_INVALID_ID = 1;
-  const ERROR_UNRECOGNIZED_IP = 2;
-  const ERROR_TIMEOUT = 4;
-  const ERROR_SQL_INSERT = 5;
-  const ERROR_SQL_UPDATE = 6;
-
   /**
    * Iniciamos la sesión
    * @return nothing
    */
-  final public static function init()
+  public static function init()
    {
     // Configuramos...
-    self::$configuration = get_config(str_replace('Framework\\', '', get_called_class()));
+    self::$configuration = get_config('session');
     // Obtenemos una instancia de LDB para utilizar...
-    
-    if(!empty(self::$configuration['session_table']))
+    if(!isset($_SESSION) OR session_id() == '')
      {
-      if(!isset($_SESSION) OR session_id() == '')
-       {
-        session_start();
-       }
-
-      // Iniciamos datos predeterminados para la sesión
-      if(!isset($_SESSION['hash']))
-       {
-        if(isset($_COOKIE[self::$configuration['cookie_name']]))
-         {
-          $_SESSION['hash'] = $_COOKIE[self::$configuration['cookie_name']];
-          $_SESSION['use_cookies'] = true;
-         }
-        else
-         {
-          $_SESSION['hash'] = null;
-          $_SESSION['use_cookies'] = false;
-         }
-        $_SESSION['ip'] = ip2long($_SERVER['REMOTE_ADDR']);
-       }
-      $_SESSION['datetime'] = time();
-
-      if(!empty($_SESSION['hash']))
-       {
-        self::set_id();
-       }
-      Context::add('is_logged', array('Framework\Session', 'is_session'));
+      session_start();
      }
-   } // public static function start();
+
+    $_SESSION['datetime'] = time();
+
+    if(isset($_COOKIE[self::$configuration['cookie_name']]))
+     {
+      self::$hash = $_COOKIE[self::$configuration['cookie_name']];
+     }
+
+    if(isset($_SESSION['hash']))
+     {
+      self::$hash = $_SESSION['hash'];
+     }
+
+    if(self::$hash !== null && !empty(self::$configuration['mysql']['table']))
+     {
+      $query = LDB::query('SELECT '
+       .self::$configuration['mysql']['field_user'].', '.self::$configuration['mysql']['field_cookies']
+       .' FROM '.self::$configuration['mysql']['table']
+       .' WHERE '.self::$configuration['mysql']['field_hash'].' = ? AND '.self::$configuration['mysql']['field_time'].' > ? LIMIT 0, 1'
+       , array(self::$hash, (time() - self::$configuration['duration'])), true);
+      if($query !== false && !empty($query))
+       {
+        self::set_id($query[self::$configuration['mysql']['field_user']], $query[self::$configuration['mysql']['field_cookies']]);
+       }
+     }
+   } // public static function init();
 
 
 
   /**
-   * Configuramos la sesión
-   * @param String $mode Modo (ID o Hash) a setear
-   * @param Integer $value Valor a setear
-   * @param Boolean $cookies Usamos cookies o no.
+   * Asignar un ID a la sesión.
+   * @param Integer $id Identificador de usuario a setear.
+   * @param Boolean $cookies Indica el uso de cookies
    * @return boolean
    */
-  public static function set_id($value = null, $cookies = null)
+  public static function set_id($id, $cookies = false)
    {
-    $hash = ($value !== null) ? hash(self::$configuration['algorithm'], $value) : $_SESSION['hash'];
-    $cookies = (boolean) ($cookies !== null) ? $cookies : $_SESSION['use_cookies'];
+    if(!empty(self::$configuration['mysql']['table']))
+     {
+      $_SESSION['hash'] = hash(self::$configuration['algorithm'], $id);
+      self::$hash = $_SESSION['hash'];
 
-    // De existir la sesión en la base de datos, la actualizamos. Èsto sólo
-    // sucedería si el usuario ingresa desde otra computadora.
-    $query = LDB::select(self::$configuration['session_table'], LDB::ALL, array('hash' => $hash));
-    if($query !== false AND $query !== null)
-     {
-      if(self::$configuration['duration'] > ($_SESSION['datetime'] - $query['session_datetime'])) // Vida
-       {
-        if(LDB::update(self::$configuration['session_table'], array('session_datetime' => $_SESSION['datetime'], 'session_use_cookies' => $cookies), array('hash' => $_SESSION['hash'])) !== false)
-         {
-          $result = self::SUCCESS;
-         } else { $result = self::ERROR_SQL_UPDATE; }
-       } else { $result = self::ERROR_TIMEOUT; }
-     }
-    else
-     {
-      // Seteamos una nueva sesión
-      if($value !== null)
-       {
-        if(self::$db->insert(self::$configuration['session_table'], array(
-         'hash' => $hash,
-         'user_id' => $value,
-         'session_ip' => $_SESSION['ip'],
-         'session_datetime' => $_SESSION['datetime'],
-         'session_use_cookies' => $cookies)) !== false) { $result = self::SUCCESS; }
-        else { $result = self::ERROR_SQL_INSERT; }
-       }
-      else { $result = self::SUCCESS; }
-    }
-
-    if($result === self::SUCCESS)
-     {
-      $_SESSION['hash'] = $hash;
-      $_SESSION['user_id'] = (!isset($query['user_id'])) ? $value : $query['user_id'];
-      $_SESSION['datetime'] = time();
-      $_SESSION['use_cookies'] = $cookies;
-      self::set_user_object();
       if($cookies === true)
        {
-        setcookie(self::$configuration['cookie_name'], $_SESSION['hash'], (time() + self::$configuration['cookie_life']), self::$configuration['cookie_path'], self::$configuration['cookie_domain']);
+        setcookie(self::$configuration['cookie_name'], self::$hash, (time() + self::$configuration['duration']), self::$configuration['cookie_path'], self::$configuration['cookie_domain']);
        }
 
-      return true;
+      LDB::query('INSERT INTO '.self::$configuration['mysql']['table'].' ('.self::$configuration['mysql']['field_hash'].', '.self::$configuration['mysql']['field_user'].', '.self::$configuration['mysql']['field_time'].', '.self::$configuration['mysql']['field_cookies'].')
+       VALUES (\''.self::$hash.'\', '.$id.', '.$_SESSION['datetime'].', '.(int) $cookies
+       .') ON DUPLICATE KEY UPDATE '.self::$configuration['mysql']['field_time'].' = '.$_SESSION['datetime'].', '.self::$configuration['mysql']['field_cookies'].' = '.(int) $cookies, null, true);
+
+      return self::set_user_object($id);
      }
     else
      {
-      if($result === self::ERROR_UNRECOGNIZED_IP OR $result === self::ERROR_TIMEOUT OR $result === self::ERROR_SQL_UPDATE)
-       {
-        self::end();
-       }
-     return false;
+      throw new Session_Exception('No se ha configurado la sesi&oacute;n. revise el archivo configurations/session.php');
      }
    } // public static function set_id();
+
 
 
 
@@ -148,12 +110,16 @@ final class Session
     * Seteamos el modelo de usuario
     * @return nothing
     */
-  private static function set_user_object()
+  private static function set_user_object($id)
    {
     if(self::$configuration['user_object'] !== null)
      {
-      self::$user = Factory::create(self::$configuration['user_object'], $_SESSION['user_id'], self::$configuration['user_fields'], true, true);
-      self::$user = self::$user->get_array();
+      self::$user = Factory::create(self::$configuration['user_object'], $id, self::$configuration['user_fields'], true, true);
+      return true;
+     }
+    else
+     {
+      throw new Session_Exception('No se ha asignado un modelo para el Usuario en Sesi&oacute;n.');
      }
    } // private static function set_user_object();
 
@@ -165,7 +131,7 @@ final class Session
     */
   public static function is_session()
    {
-    return (isset($_SESSION) AND self::$user !== null);
+    return !empty(self::$user);
    } // private static function is_user_id()
 
 
@@ -176,12 +142,13 @@ final class Session
    */
   public static function end()
    {
+    self::$user = null;
     // Borramos la sesión por el lado de la base de datos.
-    self::$db->delete(self::$configuration['session_table'], array('hash' => $_SESSION['hash']), false);
+    LDB::delete(self::$configuration['mysql']['table'], array(self::$configuration['mysql']['field_hash'] => $_SESSION['hash']), false);
     // Si existe una cookie, la destruímos
     if(isset($_COOKIE))
      {
-      setcookie(self::$configuration['cookie_name'], $_SESSION['hash'], (time() - self::$configuration['cookie_life']), self::$configuration['cookie_path'], self::$configuration['cookie_domain']);
+      setcookie(self::$configuration['cookie_name'], $_SESSION['hash'], (time() - self::$configuration['duration']), self::$configuration['cookie_path'], self::$configuration['cookie_domain']);
       unset($_COOKIE);
      }
     // Destruímos la sesión por el lado del compilador.
