@@ -93,13 +93,14 @@ final class Core
     */
   public static function init()
    {
+    self::load_components();
+
     self::$config = get_config('core');
 
     self::$avaiable_controllers = get_config('routes');
 
     self::$default_routing = array('controller' => self::$config['default_controller'], 'method' => self::$config['default_method']);
 
-    self::load_components();
     // Cargamos configuraciones del sitio y las preferencias del usuario
     //TODO: Crear el modelo de preferencias de usuario
     self::route();
@@ -165,7 +166,7 @@ final class Core
    */
   private static function call_controller($controller = null, $method = null, $value = null, $page = 1, $ignore_post = false)
    {
-    // Si hubo un error, llamamos al controlador correspondiente
+    // En caso de error, llamamos al controlador correspondiente
     if(self::$error !== null)
      {
       self::$target_routing = self::$error_routes;
@@ -292,12 +293,14 @@ final class Core
   private static function load_components()
    {
     // Precarga de LittleDB para su próximo uso por los modelos.
+    load_component('Configuration');
+    Configuration::init();
     load_component('LDB');
     LDB::init();
+    Configuration::load_from_db();
     load_component('Controller');
     load_component('Factory');
     load_component('Model');
-    load_component('Controller');
     load_component('Session');
     Session::init();
     load_component('View');

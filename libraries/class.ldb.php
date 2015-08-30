@@ -112,8 +112,15 @@ class LDB
       $res = self::do_query($query);
       if($res !== false)
        {
-        $return = $res->fetch_assoc();
-        $res->free();
+        if($res === true)
+         {
+          $return = true;
+         }
+        else
+         {
+          $return = $res->fetch_assoc();
+          $res->free();
+         }
        }
       else
        {
@@ -385,7 +392,7 @@ class LDB
      }
     elseif(is_array($input))
      {
-      return implode(', ', array_map(array(self, 'parse_input'), $input));
+      return implode(', ', array_map(array('self', 'parse_input'), $input));
      } 
     else
      {
