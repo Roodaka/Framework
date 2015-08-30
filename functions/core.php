@@ -1,13 +1,13 @@
 <?php defined('ROOT') or exit('No tienes Permitido el acceso.');
 /**
  * libs/functions.php
- * Cody Roodaka
+ * @author Cody Roodaka
  * Creado el 03/04/2011 01:17 a.m.
  */
 
 
 /**
- * Armamos una URL
+ * Construir una URL
  * @param string $mod Módulo objetivo
  * @param string $val Valor
  * @param string $sec Submódulo
@@ -26,6 +26,11 @@ function url($controller, $method = null, $value = null, $page = null, $title = 
 
 
 
+/**
+ * Cargar un componente interno del Framework.
+ * @param string $target Nombre del componente
+ * @return nothing
+ */
 function load_component($target)
  {
   if(!class_exists($target))
@@ -41,6 +46,13 @@ function load_component($target)
    }
  }
 
+
+
+/**
+ * Cargar una librería de usuario
+ * @param string $target Nombre de la librería
+ * @return nothing
+ */
 function load_util($target)
  {
   if(!class_exists($target))
@@ -57,6 +69,12 @@ function load_util($target)
  }
 
 
+
+/**
+ * Cargar una librería de terceros
+ * @param string $target Nombre de la librería
+ * @return nothing
+ */
 function load_third_party($target)
  {
   if(!class_exists($target))
@@ -74,6 +92,15 @@ function load_third_party($target)
 
 
 
+/**
+ * Crear un modelo.
+ * @param string $name Nombre del modelo
+ * @param integer $id Identificador del modelo (opcional)
+ * @param array|string $specified_fields Campos específicos a cargar (opcional)
+ * @param boolean $autoload Auto cargar los datos del modelo
+ * @param boolean $protected Proteger el modelo indicado a la limpieza de modelos.
+ * @return object Referencia al objeto creado.
+ */
 function load_model($model, $id = null, $specified_fields = null, $autoload = true, $protected = false)
  {
   return \Framework\Factory::create($model, $id, $specified_fields, $autoload, $protected);
@@ -86,7 +113,6 @@ function load_model($model, $id = null, $specified_fields = null, $autoload = tr
  * @param int $page Número de página
  * @param int $limit Límite de resultados por página
  * @return array
- * @author Cody Roodaka <roodakazo@gmail.com>
  */
 function paginate($page, $limit)
  {
@@ -105,12 +131,14 @@ function paginate($page, $limit)
  * Agregamos el manejo personalizado de las excepciones
  * @param object $exception Excepción entregada por el sistema
  * @return nothing
- * @author Cody Roodaka <roodakazo@gmail.com>
  */
 function exception_handler($exception)
  {
   echo '<div>
-   <h4>'.str_replace('Framework\\', '', str_replace('_Exception', '', get_class($exception))).' Error: '.$exception->getMessage().'</h4>
+   <h4>'
+    .str_replace('Framework\\', '', str_replace('_Exception', '', get_class($exception)))
+    .' Error: '.$exception->getMessage()
+   .'</h4>
    <p><b>File</b>: '.str_replace(ROOT, 'HOME_DIR'.DS, $exception->getFile()).'</p>
    <p><b>Trace</b>: '.str_replace(ROOT, 'HOME_DIR'.DS, $exception->getTraceAsString()).'</p>
   </div>';
@@ -118,14 +146,65 @@ function exception_handler($exception)
 
 
 
+/**
+ * Solicitar un arreglo (o un campo) de configuración.
+ * @param string $target Nombre del arreglo de configuraciones.
+ * @param string $field Campo específico a cargar del arreglo anteriormente indicado
+ * @return array|mixed
+ */
 function get_config($target, $field = null)
  {
-  return Framework\Configuration::get($target, $field);
+  return \Framework\Configuration::get($target, $field);
  }
 
 
 
-function get_routing_controller() { return \Framework\Core::$target_routing['controller']; }
-function get_routing_method() { return \Framework\Core::$target_routing['method']; }
-function get_routing_value() { return \Framework\Core::$target_routing['value']; }
-function get_routing_page() { return \Framework\Core::$target_routing['page']; }
+/**
+ * Obtener el nombre del controlador actual.
+ * @return string
+ */
+function get_routing_controller()
+ {
+  return \Framework\Core::$target_routing['controller'];
+ }
+
+
+
+/**
+ * Obtener el nombre del método actual.
+ * @return string
+ */
+function get_routing_method()
+ {
+  return \Framework\Core::$target_routing['method'];
+ }
+
+
+
+/**
+ * Obtener el nombre del controlador actual.
+ * @param boolean $return_int Exigir el retorno de un número o de una cadena
+ * @return string|integer
+ */
+function get_routing_value($return_int = true)
+ {
+  if($return_int === true)
+   {
+    return (int) \Framework\Core::$target_routing['value'];
+   }
+  else
+   {
+    return \Framework\Core::$target_routing['value'];
+   }
+ }
+
+
+
+/**
+ * Obtener el número de página actual
+ * @return integer
+ */
+function get_routing_page()
+ {
+  return (int) \Framework\Core::$target_routing['page'];
+ }
