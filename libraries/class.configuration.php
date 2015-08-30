@@ -30,11 +30,27 @@ final class Configuration
    * Éste cargará la lista de configuraciones obtenibles
    * desde la base de datos como la configuración del sitio.
    */
-  public function init()
+  public static function init()
    {
     self::$configuration = require_once(CONFIGURATIONS_DIR.'configuration'.EXT);
    }
 
+
+
+  public static function load_from_db()
+   {
+    if(!empty(self::$configuration['from_db']))
+     {
+      foreach(self::$configuration['from_db'] as $variable => $data)
+       {
+        $select = LDB::select($data['table'], array($data['key_field'], $data['value_field']), $data['where'], null, 50);
+        while($row = $select->fetch())
+         {
+          self::$variables[$variable][$row[$data['key_field']]] = $row[$data['value_field']];
+         }
+       }
+     }
+   }
 
 
   /**
