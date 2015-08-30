@@ -251,7 +251,7 @@ abstract class Model
    */
   final public function set_id_by_key($key, $value)
    {
-    $temp = LDB::select($this->table, $this->primary_key, array($key, $value), 1);
+    $temp = LDB::select($this->table, $this->primary_key, array($key => $value));
     if($temp !== false)
      {
       return $this->set_id($temp[$this->primary_key]);
