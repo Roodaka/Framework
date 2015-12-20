@@ -27,4 +27,4 @@ class Example extends F\Model
    'datetime');
 
 
- } // class User();
+ } // class Example();

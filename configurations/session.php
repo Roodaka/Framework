@@ -14,10 +14,6 @@ return array(
  'user_object' => null,
  'user_fields' => null,
 
- 'duration' => 604800,
- 'algorithm' => 'md5',
- 'user_object' => null,
- 'user_fields' => null,
  'cookie_life' => 300, // cinco minutos
  'cookie_name' => 'rdk_framework',
  'cookie_path' => DS,
