@@ -160,6 +160,24 @@ function get_config($target, $field = null)
 
 
 /**
+ * Chequeamos si estamos en una ruta específica
+ * @return boolean
+ */
+function is_routing($controller, $method = null)
+ {
+  if($method !== null)
+   {
+    return ($controller === \Framework\Core::$target_routing['controller'] && $method === \Framework\Core::$target_routing['method']);
+   }
+  else
+   {
+    return ($controller === \Framework\Core::$target_routing['controller']);
+   }
+ }
+
+
+
+/**
  * Obtener el nombre del controlador actual.
  * @return string
  */
