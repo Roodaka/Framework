@@ -48,6 +48,7 @@ function load_component($target)
 
 
 
+
 /**
  * Cargar una librería de usuario
  * @param string $target Nombre de la librería
@@ -119,8 +120,7 @@ function paginate($page, $limit)
   if($page === 1) { $return = array(0, $limit); }
   else
    {
-    $start = (($page - 1) * $limit);
-    $return = array($start, ($start + $limit));
+    $return = array((($page - 1) * $limit), $limit);
    }
   return $return; 
  } // function paginate();
