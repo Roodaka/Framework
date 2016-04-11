@@ -53,6 +53,7 @@ class LDB
   const REST = '-';
   const FIELDS = 0;
   const VALUES = 1;
+  const NULL = 'NULL';
 
 
 
@@ -189,14 +190,14 @@ class LDB
          {
           $values[] = '( '.self::parse_input($row).' )';
          }
-        $values = implode(', ', $values).';';
+        $values = implode(', ', $values);
        }
       else
        {
         $fields = implode(', ', array_keys($data));
-        $values = self::parse_input($data);
+        $values = '( '.self::parse_input($data).' )';
        }
-      $cons = 'INSERT INTO '.self::$data['name'].'.'.self::$data['prefix'].$table.' ( '.$fields.' ) VALUES ( '.$values.' )';
+      $cons = 'INSERT INTO '.self::$data['name'].'.'.self::$data['prefix'].$table.' ( '.$fields.' ) VALUES '.$values;
       $query = self::do_query($cons);
       // Seteamos el resultado,
       return (!$query || $query == false) ? self::error($cons) : self::$conn->insert_id;
@@ -339,7 +340,7 @@ class LDB
    */
   private static function parse_order($order = null)
    {
-    return ($order !== null) ? $order : '';
+    return ($order !== null) ? 'ORDER BY '.$order : '';
    }
 
 
@@ -382,11 +383,11 @@ class LDB
   */
   private static function parse_input($input)
    {
-    if(is_bool($input))
+    if(is_bool($input) or $input === null OR empty($input) === true)
      {
       return (int) $input;
      }
-    elseif($input === null OR empty($input) === true)
+    elseif($input === self::NULL)
      {
       return 'NULL';
      }
