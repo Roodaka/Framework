@@ -17,7 +17,7 @@ final class Core
    * Arreglo de Controladores disponibles.
    * @var array
    */
-  protected static $avaiable_controllers = array();
+  private static $avaiable_controllers = array();
 
   /**
    * Configuración del sistema
@@ -35,7 +35,7 @@ final class Core
    * Ruta de ruteo en caso de errores.
    * @var array
    */
-  protected static $error_routes = array(
+  private static $error_routes = array(
    'controller' => 'error',
    'method' => 'main',
    'value' => null,
@@ -45,7 +45,7 @@ final class Core
    * Ruta por defecto
    * @var array
    */
-  protected static $default_routing = array(
+  private static $default_routing = array(
    'controller' => null,
    'method' => null,
    'value' => null,
@@ -65,11 +65,16 @@ final class Core
    * Ruta solicitada para redireccionamiento.
    * @var array
    */
-  protected static $new_routing = array(
+  private static $new_routing = array(
    'controller' => null,
    'method' => null,
    'value' => null,
    'page' => 1);
+  /**
+   * URL de ruta hacia el sistema.
+   * @var string
+   */
+  public static $url_fullpath = null;
 
   // Constantes que definen los errores en la carga del controlador
   const ROUTING_ERROR_CONTEXT = 'routing_error_context';
@@ -100,6 +105,11 @@ final class Core
     self::$avaiable_controllers = get_config('routes');
 
     self::$default_routing = array('controller' => self::$config['default_controller'], 'method' => self::$config['default_method']);
+
+    $path = explode('/', $_SERVER['REQUEST_URI']);
+    array_shift($path);
+    array_pop($path);
+    self::$url_fullpath = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].'/'.implode('/', $path).'/';
 
     // Cargamos configuraciones del sitio y las preferencias del usuario
     //TODO: Crear el modelo de preferencias de usuario
