@@ -151,7 +151,7 @@ final class Factory
    {
     $object = self::create($model);
     $query = LDB::select($object->table, $object->primary_key, $condition, $order, $limits);
-    if($query !== false && !is_array($query))
+    if(!empty($query) && !is_array($query))
      {
       $result = array();
       while($row = $query->fetch())
