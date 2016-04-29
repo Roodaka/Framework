@@ -1,5 +1,6 @@
 // TODO ========================================================================
 Implementar PDO en LDB
+Implementar Iteraciones en Query
 Reescribir RainTPL 
 Terminar Vadlidator
 
