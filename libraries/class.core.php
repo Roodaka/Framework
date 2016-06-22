@@ -314,6 +314,7 @@ final class Core
     load_component('Session');
     Session::init();
     load_component('View');
+    View::init();
    } // private static function load_components();
  } // final class Core();
 

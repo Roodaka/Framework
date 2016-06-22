@@ -213,6 +213,3 @@ final class View
  * @access private
  */
 class View_Exception Extends \Exception { } // class View_Exception();
-
-// Iniciamos el componente.
-View::init();
