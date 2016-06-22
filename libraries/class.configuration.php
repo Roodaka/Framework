@@ -43,7 +43,7 @@ final class Configuration
      {
       foreach(self::$configuration['from_db'] as $variable => $data)
        {
-        $select = LDB::select($data['table'], array($data['key_field'], $data['value_field']), $data['where'], null, 50);
+        $select = \Framework\LDB::select($data['table'], array($data['key_field'], $data['value_field']), $data['where'], null, 50);
         while($row = $select->fetch())
          {
           self::$variables[$variable][$row[$data['key_field']]] = $row[$data['value_field']];

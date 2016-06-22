@@ -9,8 +9,6 @@
 
 namespace Framework;
 
-use \Framework\Models;
-
 defined('ROOT') or exit('No tienes Permitido el acceso.');
 
 final class Factory
@@ -150,7 +148,7 @@ final class Factory
   final public static function create_from_database($model = null, $condition = null, $order = null, $limits = null, $autoload = true, $return_array = true)
    {
     $object = self::create($model);
-    $query = LDB::select($object->table, $object->primary_key, $condition, $order, $limits);
+    $query = \Framework\LDB::select($object->table, $object->primary_key, $condition, $order, $limits);
     if(!empty($query) && !is_array($query))
      {
       $result = array();
