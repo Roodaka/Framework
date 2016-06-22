@@ -44,7 +44,7 @@ final class View
 
   final public static function init()
    {
-    self::$configuration = get_config(str_replace('Framework\\', '', get_called_class()));
+    self::$configuration = get_config('view');
    }
 
 
