@@ -208,14 +208,15 @@ abstract class Model
     $temp = LDB::select($this->table, (($this->specified_fields === null) ? $this->fields : array_intersect($this->specified_fields, $this->fields)), array($this->primary_key => $this->id));
     if($temp !== false)
      {
-      $this->data = $temp;
+      $this->data = $temp->fetch();
       return true;
      }
     else
      {
+      throw new Model_Exception('No se pudo cargar los datos del modelo '.$this->table.'('.$this->id.').');
       return false;
      }
-   } // protected function load_data();
+   }
 
 
 
@@ -254,6 +255,7 @@ abstract class Model
     $temp = LDB::select($this->table, $this->primary_key, array($key => $value));
     if($temp !== false)
      {
+      $temp = $temp->fetch();
       return $this->set_id($temp[$this->primary_key]);
      }
    }
@@ -304,6 +306,23 @@ abstract class Model
        }
      }
    } // final protected function set_field();
+
+
+
+  /**
+   * Obtenemos la cantidad filas del modelo
+   * @return int Número de filas
+   */
+  final public function count($condition = null)
+   {
+    $query = \Framework\LDB::select($this->table, 'COUNT(DISTINCT('.$this->primary_key.')) AS total', $condition);
+    if($query !== false)
+     {
+      return $query->fetch('total');
+     }
+    return 0; 
+   }
+
 
 
 
