@@ -59,11 +59,11 @@ final class Session
 
     if(self::$hash !== null && !empty(self::$configuration['mysql']['table']))
      {
-      $query = LDB::query('SELECT '
-       .self::$configuration['mysql']['field_user'].', '.self::$configuration['mysql']['field_cookies']
+      $query = \Framework\LDB::query('SELECT '.self::$configuration['mysql']['field_user'].', '.self::$configuration['mysql']['field_cookies']
        .' FROM '.self::$configuration['mysql']['table']
        .' WHERE '.self::$configuration['mysql']['field_hash'].' = ? AND '.self::$configuration['mysql']['field_time'].' > ? LIMIT 0, 1'
        , array(self::$hash, (time() - self::$configuration['duration'])), true);
+
       if($query !== false && !empty($query))
        {
         self::set_id($query[self::$configuration['mysql']['field_user']], $query[self::$configuration['mysql']['field_cookies']]);
@@ -91,7 +91,7 @@ final class Session
         setcookie(self::$configuration['cookie_name'], self::$hash, (time() + self::$configuration['duration']), self::$configuration['cookie_path'], self::$configuration['cookie_domain']);
        }
 
-      LDB::query('INSERT INTO '.self::$configuration['mysql']['table'].' ('.self::$configuration['mysql']['field_hash'].', '.self::$configuration['mysql']['field_user'].', '.self::$configuration['mysql']['field_time'].', '.self::$configuration['mysql']['field_cookies'].')
+      \Framework\LDB::query('INSERT INTO '.self::$configuration['mysql']['table'].' ('.self::$configuration['mysql']['field_hash'].', '.self::$configuration['mysql']['field_user'].', '.self::$configuration['mysql']['field_time'].', '.self::$configuration['mysql']['field_cookies'].')
        VALUES (\''.self::$hash.'\', '.$id.', '.$_SESSION['datetime'].', '.(int) $cookies
        .') ON DUPLICATE KEY UPDATE '.self::$configuration['mysql']['field_time'].' = '.$_SESSION['datetime'].', '.self::$configuration['mysql']['field_cookies'].' = '.(int) $cookies, null, true);
 
@@ -114,7 +114,7 @@ final class Session
    {
     if(self::$configuration['user_object'] !== null)
      {
-      self::$user = Factory::create(self::$configuration['user_object'], $id, self::$configuration['user_fields'], true, true);
+      self::$user = \Framework\Factory::create(self::$configuration['user_object'], $id, self::$configuration['user_fields'], true, true);
       return true;
      }
     else
@@ -144,7 +144,7 @@ final class Session
    {
     self::$user = null;
     // Borramos la sesión por el lado de la base de datos.
-    LDB::delete(self::$configuration['mysql']['table'], array(self::$configuration['mysql']['field_hash'] => $_SESSION['hash']), false);
+    \Framework\LDB::delete(self::$configuration['mysql']['table'], array(self::$configuration['mysql']['field_hash'] => $_SESSION['hash']), false);
     // Si existe una cookie, la destruímos
     if(isset($_COOKIE))
      {
