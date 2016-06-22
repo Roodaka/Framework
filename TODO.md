@@ -1,14 +1,14 @@
 // TODO ========================================================================
-Implementar PDO en LDB
-Implementar Iteraciones en Query
 Reescribir RainTPL 
+Implementar ORM en Factory 
+Implementar Iteraciones en Query
 Terminar Vadlidator
 
 // BUGS ========================================================================
-Rutas en RainTPL - no me convencen.
 Revisar el manejo de lenguajes en View.
+Clase Controller
 
 // FEATURES ====================================================================
 Utilidad para generar botones de Paginado
 Utilidad para subida segura de imágenes 
-Utilidad para oAuth 2.0
+Utilidad oAuth 2.0
