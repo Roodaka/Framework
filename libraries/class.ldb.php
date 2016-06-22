@@ -26,23 +26,16 @@ class LDB
   private static $conn = null;
 
   /**
-   * Arreglo con los datos de conexión al servidor MySQL
-   * @var array
-   */
-  private static $data = array(
-   'host' => null,
-   'port' => null,
-   'user' => null,
-   'pass' => null,
-   'name' => null,
-   'prefix' => null
-   );
-
-  /**
    * Cantidad de consultas realizadas
    * @var integer
    */
   public static $count = 0;
+
+  /**
+   * Última consulta ejecutada
+   * @var string
+   */
+  private static $last_query = '';
 
 
   /**
@@ -51,9 +44,6 @@ class LDB
   const ALL = '*';
   const ADD = '+';
   const REST = '-';
-  const FIELDS = 0;
-  const VALUES = 1;
-  const NULL = 'NULL';
 
 
 
@@ -69,20 +59,9 @@ class LDB
    */
   public static function init()
    {
-    self::$data = get_config('database');
+    $data = get_config('database');
     // Conectamos a la base de datos.
-    self::connect();
-   }
-
-
-
-  /**
-   * Conectar al servidor MySQL
-   * @return nothing
-   */
-  private static function connect()
-   {
-    self::$conn = mysqli_connect(self::$data['host'], self::$data['user'], self::$data['pass'], self::$data['name']) or self::error('', 'No se pudo conectar al servidor MySQL');
+    self::$conn = mysqli_connect($data['host'], $data['user'], $data['pass'], $data['name']) or self::error('', 'No se pudo conectar al servidor MySQL');
    }
 
 
@@ -105,36 +84,18 @@ class LDB
    * @param boolean $ret retornar Array de datos o no.
    * @return mixed
    */
-  public static function query($cons, $values = null, $ret = false)
+  public static function query($raw_query, $values = null, $auto_fetch = false)
    {
-    $query = ($values != null) ? self::parse_vars($cons, $values) : $cons;
-    if($ret == true)
+    $query = self::do_query(($values != null) ? self::parse_vars($raw_query, $values) : $raw_query);
+    if($query !== false)
      {
-      $res = self::do_query($query);
-      if($res !== false)
-       {
-        if($res === true)
-         {
-          $return = true;
-         }
-        else
-         {
-          $return = $res->fetch_assoc();
-          $res->free();
-         }
-       }
-      else
-       {
-        $return = false;
-        self::error($query);
-       }
+      $query = new \Framework\LDB_Result($query);
+      return ($auto_fetch === true) ? $query->fetch() : $query;
      }
     else
      {
-      $return = new \Framework\Query($query, self::$conn);
-      ++self::$count;
+      return self::error();
      }
-    return $return;
    }
 
 
@@ -144,29 +105,19 @@ class LDB
    * @param string $table Nombre de la tabla objetivo
    * @param array|string $fields
    * @param array $condition Condicionante para la selección
+   * @param array|integer $order Ordenado
    * @param array|integer $limit Límite de filas
    * @return array
    */
   public static function select($table, $fields, $condition = null, $order = null, $limits = null)
    {
-    $cons = 'SELECT '.(is_array($fields) ? implode(', ', $fields) : $fields).' FROM '.self::$data['name'].'.'.self::$data['prefix'].$table.' '.self::parse_where($condition).' '.self::parse_order($order).' '.self::parse_limits($limits);
+    $cons = 'SELECT '.(is_array($fields) ? implode(', ', $fields) : $fields).' FROM '.$table.' '.self::parse_where($condition).' '.self::parse_order($order).' '.self::parse_limits($limits);
     $query = self::do_query($cons);
-    if(!$query || $query == false)
+    if($query !== false)
      {
-     return false;
+      return new \Framework\LDB_Result($query);
      }
-    else
-     {
-      if((int) $limits > 1 || is_array($limits))
-       {
-        return new \Framework\Query($cons, self::$conn);
-        ++self::$count;
-       }
-      else
-       {
-        return $query->fetch_assoc();
-       }
-     }
+    return false; 
    }
 
 
@@ -181,28 +132,12 @@ class LDB
    {
     if(is_array($data) === true)
      {
-      // Tenemos una inserción de múltiples filas
-      if(isset($data[self::FIELDS]) && isset($data[self::VALUES]))
-       {
-        $fields = implode(', ', $data[self::FIELDS]);
-        $values = array();
-        foreach($data[self::VALUES] as $row)
-         {
-          $values[] = '( '.self::parse_input($row).' )';
-         }
-        $values = implode(', ', $values);
-       }
-      else
-       {
-        $fields = implode(', ', array_keys($data));
-        $values = '( '.self::parse_input($data).' )';
-       }
-      $cons = 'INSERT INTO '.self::$data['name'].'.'.self::$data['prefix'].$table.' ( '.$fields.' ) VALUES '.$values;
+      $cons = 'INSERT INTO '.$table.' ( '.implode(', ', array_keys($data)).' ) VALUES ( '.self::parse_input($data).' )';
       $query = self::do_query($cons);
       // Seteamos el resultado,
-      return (!$query || $query == false) ? self::error($cons) : self::$conn->insert_id;
+      return ($query !== false) ? self::$conn->insert_id : self::error();
      }
-    else { return false; }
+    return false;
    }
 
 
@@ -218,10 +153,11 @@ class LDB
    {
     if(is_array($cond) === true)
      {
-      $cons = 'DELETE FROM '.self::$data['name'].'.'.self::$data['prefix'].$table.' '.self::parse_where($cond);
+      $cons = 'DELETE FROM '.$table.' '.self::parse_where($cond);
       $query = self::do_query($cons);
-      return (!$query || $query == false) ? self::error($cons) : self::$conn->affected_rows;
-     } else { return false; }
+      return ($query !== false) ? self::$conn->affected_rows : self::error($cons);
+     }
+    return false;
    }
 
 
@@ -242,10 +178,11 @@ class LDB
        {
         $fields[] = $field.' = '.((is_array($value)) ? $field.' '.$value[0].' '.(int) $value[1]: self::parse_input($value));
        }
-      $cons = 'UPDATE '.self::$data['name'].'.'.self::$data['prefix'].$table.' SET '.implode(', ', $fields).' '.self::parse_where($cond);
+      $cons = 'UPDATE '.$table.' SET '.implode(', ', $fields).' '.self::parse_where($cond);
       $query = self::do_query($cons);
-      return (!$query || $query == false) ? self::error($cons) : self::$conn->affected_rows;
-     } else { return false; }
+      return ($query !== false) ?self::$conn->affected_rows : self::error($cons);
+     }
+    return false;
    }
 
 
@@ -258,6 +195,7 @@ class LDB
   private static function do_query($query)
    {
     ++self::$count;
+    self::$last_query = $query;
     return mysqli_query(self::$conn, $query);
    }
 
@@ -268,9 +206,9 @@ class LDB
    * @param string $query Consulta que origina el error
    * @return nothing
    */
-  private static function error($query, $error = null)
+  private static function error($error = null)
    {
-    throw new LDB_Exception((($query !== '') ?'<span>Error en la consulta <i>'.$query.'</i></br>' : '').'</p><p><b>Error MySQL</b>: '.(($error !== null) ? $error : mysqli_error(self::$conn)).'</p>');
+    throw new LDB_Exception(((self::$last_query !== '') ?'<span>Error en la consulta <i>'.self::$last_query.'</i></br>' : '').'</p><p><b>Error MySQL</b>: '.(($error !== null) ? $error : mysqli_error(self::$conn)).'</p>');
    }
 
 
@@ -303,7 +241,11 @@ class LDB
        }
       return 'WHERE '.implode(' AND ', $array);
      }
-    else
+    elseif(!empty($conditions))
+     {
+      return 'WHERE '.$conditions;
+     }
+    else 
      {
       return '';
      }
@@ -387,7 +329,7 @@ class LDB
      {
       return (int) $input;
      }
-    elseif($input === self::NULL)
+    elseif(is_null($input))
      {
       return 'NULL';
      }
@@ -410,13 +352,13 @@ class LDB
  * @author Cody Roodaka <roodakazo@gmail.com>
  * @access private
  */
-class Query
+class LDB_Result
  {
   /**
    * Recurso MySQL
    * @var resource
    */
-  private $data = false;
+  private $resource = false;
 
   /**
    * Resultado de la consulta
@@ -445,19 +387,18 @@ class Query
    * @param resource $conn Recurso de conección SQL
    * @author Cody Roodaka <roodakazo@gmail.com>
    */
-  public function __construct($raw_query, $connection)
+  public function __construct($resource)
    {
-    $query = mysqli_query($connection, $raw_query);
-    if(is_object($query))
+    if(is_object($resource))
      {
-      $this->data = $query;
+      $this->resource = $resource;
       $this->position = 0;
-      $this->rows = $this->data->num_rows;
-      return true;
+      $this->rows = $this->resource->num_rows;
+      return $this;
      }
     else
      {
-      throw new LDB_Exception((($query !== '') ? '<span>Error en la consulta <i>'.$query.'</i></br>' : '').'</p>');
+      return false;
      }
    }
 
@@ -482,7 +423,7 @@ class Query
    */
   private function free()
    {
-    return (is_resource($this->data)) ? $this->data->free() : true;
+    return (is_object($this->resource)) ? $this->resource->free() : true;
    }
 
 
@@ -493,17 +434,20 @@ class Query
    * @param string $default Valor a retornar si el campo no existe o está vacío.
    * @return array|string Todos los campos o sólo uno
    */
-  public function fetch($field = null, $default = null)
+  public function fetch($field = null, $default = false)
    {
-    $this->result = $this->data->fetch_assoc();
+    $this->result[$this->position] = $this->resource->fetch_assoc();
+    
     if($field !== null) // Pedimos un campo en especial
      {
-      return (isset($this->result[$field])) ? $this->result[$field] : $default;
+      $result = (isset($this->result[$this->position][$field])) ? $this->result[$this->position][$field] : $default;
      }
     else
      {
-      return $this->result;
+      $result = $this->result[$this->position];
      }
+    ++$this->position;
+    return $result;
    }
 
  }

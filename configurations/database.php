@@ -9,7 +9,5 @@ return array(
  // Contraseña
  'pass' => '',
  // Nombre de la Base de Datos
- 'name' => 'framework',
- // Prefijo de la base de datos (se utilizará en las funciones select, update, delete e insert).
- 'prefix' => ''
+ 'name' => 'framework'
  );
