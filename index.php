@@ -31,11 +31,33 @@ define('VIEWS_DIR', ROOT.'views'.DS);
 // Cargamos las funciones básicas del núcleo
 require(FUNCTIONS_DIR.'core'.EXT);
 
+/*
+ * Asignamos la función del framework para manejar las exepciones
+ */
 set_exception_handler('exception_handler');
 
-require(FUNCTIONS_DIR.'friendly'.EXT);
+/*
+ * Cargamos los componentes base del Framework 
+ */
+require_once(LIBRARIES_DIR.'class.configuration'.EXT);
+\Framework\Configuration::init();
 
-load_component('Configuration');
+require_once(LIBRARIES_DIR.'class.ldb'.EXT);
+\Framework\LDB::init();
+\Framework\Configuration::load_from_db();
+
+require_once(LIBRARIES_DIR.'class.controller'.EXT);
+
+require_once(LIBRARIES_DIR.'class.factory'.EXT);
+
+require_once(LIBRARIES_DIR.'class.model'.EXT);
+
+require_once(LIBRARIES_DIR.'class.session'.EXT);
+\Framework\Session::init();
+
+require_once(LIBRARIES_DIR.'class.view'.EXT);
+\Framework\View::init();
+
 // Cargamos e iniciamos el núcleo.
-load_component('Core');
+require_once(LIBRARIES_DIR.'class.core'.EXT);
 \Framework\Core::init();

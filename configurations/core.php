@@ -1,5 +1,5 @@
 <?php defined('ROOT') or exit('No tienes Permitido el acceso.');
 return array(
- 'default_controller' => 'home',
- 'default_method' => 'main',
+ 'default_route' => array('controller' => 'home','method' => 'main'),
+ 'error_route' => array('controller' => 'error','method' => 'main',),
  );

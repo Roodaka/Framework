@@ -26,32 +26,6 @@ final class Core
   public static $config = array();
 
   /**
-   * Identificador del error.
-   * @var integer
-   */
-  public static $error = null;
-
-  /**
-   * Ruta de ruteo en caso de errores.
-   * @var array
-   */
-  private static $error_routes = array(
-   'controller' => 'error',
-   'method' => 'main',
-   'value' => null,
-   'page' => 1);
-
-  /**
-   * Ruta por defecto
-   * @var array
-   */
-  private static $default_routing = array(
-   'controller' => null,
-   'method' => null,
-   'value' => null,
-   'page' => 1);
-
-  /**
    * Ruta actual
    * @var array
    */
@@ -98,13 +72,9 @@ final class Core
     */
   public static function init()
    {
-    self::load_components();
-
     self::$config = get_config('core');
 
     self::$avaiable_controllers = get_config('routes');
-
-    self::$default_routing = array('controller' => self::$config['default_controller'], 'method' => self::$config['default_method']);
 
     $path = explode('/', $_SERVER['REQUEST_URI']);
     array_shift($path);
@@ -112,7 +82,6 @@ final class Core
     self::$url_fullpath = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].'/'.implode('/', $path).'/';
 
     // Cargamos configuraciones del sitio y las preferencias del usuario
-    //TODO: Crear el modelo de preferencias de usuario
     self::route();
    } // public static function init();
 
@@ -128,13 +97,13 @@ final class Core
     if(isset($_GET[self::ROUTING_CONTROLLER_VARIABLE]))
      {
       self::$target_routing['controller'] = $_GET[self::ROUTING_CONTROLLER_VARIABLE];
-     } else { self::$target_routing['controller'] = self::$default_routing['controller']; }
+     } else { self::$target_routing['controller'] = self::$config['default_route']['controller']; }
 
     // Método
     if(isset($_GET[self::ROUTING_METHOD_VARIABLE]))
      {
       self::$target_routing['method'] = $_GET[self::ROUTING_METHOD_VARIABLE];
-     } else { self::$target_routing['method'] = self::$default_routing['method']; }
+     } else { self::$target_routing['method'] = self::$config['default_route']['method']; }
 
     // Índice
     if(isset($_GET[self::ROUTING_VALUE_VARIABLE]))
@@ -150,16 +119,7 @@ final class Core
 
     if(self::is_valid_route(self::$target_routing['controller'], self::$target_routing['method']) === false)
      {
-      // El problema es sólo el método.
-      if(self::$error === self::ROUTING_ERROR_METHOD)
-       {
-        // redireccionamos al controlador que tenía ese método
-        self::$target_routing['method'] = self::$default_routing['method'];
-       }
-      else
-       {
-        self::$target_routing = self::$error_routes;
-       }
+      self::$target_routing = self::$error_routes;
      }
 
     self::call_controller();
@@ -172,27 +132,26 @@ final class Core
 
   /**
    * Cargamos el controlador objetivo del router.
+   * @param string $controller Controlador Objetivo
+   * @param string $method Método a ejecutar
+   * @param string $value Valor o ID
+   * @param integer $page Número de página
+   * @param boolean $redirected Indica si la llamada es parte de una redirección
    * @return nothing
    */
-  private static function call_controller($controller = null, $method = null, $value = null, $page = 1, $ignore_post = false)
+  private static function call_controller($controller = null, $method = null, $value = null, $page = 1, $redirected = false)
    {
-    // En caso de error, llamamos al controlador correspondiente
-    if(self::$error !== null)
-     {
-      self::$target_routing = self::$error_routes;
-     }
-    elseif($controller !== null)
+    if($controller !== null)
      {
       $method = $method !== null ? $method : self::$default_routing['method'];
       self::$target_routing = array('controller' => $controller, 'method' => $method, 'value' => $value, 'page' => $page);
      }
 
-    // DESPUÉS DE TODO ESTO, CARGAMOS EL CONTROLADOR!!!
     require_once(CONTROLLERS_DIR.'class.'.strtolower(self::$target_routing['controller']).EXT);
 
     // Hacemos la última validación.
     $class = '\Framework\Controllers\\'.self::$target_routing['controller'];
-    $controller = new $class($ignore_post);
+    $controller = new $class($redirected);
     if(get_parent_class($controller) === 'Framework\Controller')
      {
       call_user_func_array(array($controller, self::$target_routing['method']), array());
@@ -205,16 +164,13 @@ final class Core
     // Esta porción de código sólo es llamada cuando un controlador pide, desde
     // sí mismo, una redirección, lo cual reiniciará las vistas y el controlador
     // que había sido cargado previamente
-    if(self::$new_routing['controller'] !== null AND self::$new_routing['method'] !== null)
+    if(self::$new_routing['controller'] !== null && $redirected !== false)
      {
       // Removemos el controlador anterior.
       unset($controller);
 
       // Redireccionamos a la nueva ruta.
       self::$target_routing = self::$new_routing;
-
-      // anulamos la redirección
-      self::$new_routing = array('controller' => null, 'method' => null, 'value' => null, 'page' => 1);
 
       // Reiniciamos las vistas.
       View::clear();
@@ -240,15 +196,7 @@ final class Core
    */
   public static function redirect($controller, $method = null, $value = null, $page = 1, $http_redirection = true)
    {
-    if(self::is_valid_route($controller, $method) === true)
-     {
-      $new_route = array(
-       'controller' => $controller,
-       'method' => (($method !== null) ? $method : self::$default_routing['method']),
-       'value' => $value,
-       'page' => (int) $page);
-     }
-    else
+    if(self::is_valid_route($controller, $method) === false)
      {
       $new_route = self::$error_routes;
      }
@@ -259,7 +207,7 @@ final class Core
      }
     else
      {
-      header('Location: '.url($new_route['controller'], $new_route['method'], $new_route['value'], $new_route['page'], null));
+      header('Location: '.self::$url_fullpath.url($new_route['controller'], $new_route['method'], $new_route['value'], $new_route['page'], null));
      }
    } // public static function redirect();
 
@@ -293,30 +241,7 @@ final class Core
 
     return true;
    } // private static function is_valid_route();
-
-
-
-  /**
-   * Autocarga de componentes en base al archivo de configuración core.php
-   * @return nothing
-   */
-  private static function load_components()
-   {
-    // Precarga de LittleDB para su próximo uso por los modelos.
-    load_component('Configuration');
-    Configuration::init();
-    load_component('LDB');
-    LDB::init();
-    Configuration::load_from_db();
-    load_component('Controller');
-    load_component('Factory');
-    load_component('Model');
-    load_component('Session');
-    Session::init();
-    load_component('View');
-    View::init();
-   } // private static function load_components();
- } // final class Core();
+} // final class Core();
 
 
 /**
