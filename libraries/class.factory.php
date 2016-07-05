@@ -148,7 +148,7 @@ final class Factory
   final public static function create_from_database($model = null, $condition = null, $order = null, $limits = null, $autoload = true, $return_array = true)
    {
     $object = self::create($model);
-    $query = \Framework\LDB::select($object->table, $object->primary_key, $condition, $order, $limits);
+    $query = \Framework\Database::select($object->table, $object->primary_key, $condition, $order, $limits);
     if(!empty($query) && !is_array($query))
      {
       $result = array();

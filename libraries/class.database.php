@@ -17,7 +17,7 @@ defined('ROOT') or exit('No tienes Permitido el acceso.');
 
 
 
-class LDB
+class Database
  {
   /**
    * Recurso MySQL
@@ -48,7 +48,7 @@ class LDB
 
 
   /**
-   * Inicializador de LDB
+   * Inicializador de la clase
    * @param string $host Url o DNS del Servidor MySQL
    * @param string $user Usuario del servidor
    * @param string &pass Contraseña del servidor
@@ -89,7 +89,7 @@ class LDB
     $query = self::do_query(($values != null) ? self::parse_vars($raw_query, $values) : $raw_query);
     if($query !== false)
      {
-      $query = new \Framework\LDB_Result($query);
+      $query = new \Framework\Database_Result($query);
       return ($auto_fetch === true) ? $query->fetch() : $query;
      }
     else
@@ -115,7 +115,7 @@ class LDB
     $query = self::do_query($cons);
     if($query !== false)
      {
-      return new \Framework\LDB_Result($query);
+      return new \Framework\Database_Result($query);
      }
     return false; 
    }
@@ -208,7 +208,7 @@ class LDB
    */
   private static function error($error = null)
    {
-    throw new LDB_Exception(((self::$last_query !== '') ?'<span>Error en la consulta <i>'.self::$last_query.'</i></br>' : '').'</p><p><b>Error MySQL</b>: '.(($error !== null) ? $error : mysqli_error(self::$conn)).'</p>');
+    throw new Database_Exception(((self::$last_query !== '') ?'<span>Error en la consulta <i>'.self::$last_query.'</i></br>' : '').'</p><p><b>Error MySQL</b>: '.(($error !== null) ? $error : mysqli_error(self::$conn)).'</p>');
    }
 
 
@@ -303,7 +303,7 @@ class LDB
     //Validamos que tengamos igual numero de parametros que de los necesarios.
     if(count($params) != preg_match_all("/\?/", $q, $aux))
      {
-      throw new LDB_Exception('No coinciden la cantidad de parametros necesarios con los provistos en '.$q);
+      throw new Database_Exception('No coinciden la cantidad de parametros necesarios con los provistos en '.$q);
       return $q;
      }
     //Reemplazamos las etiquetas.
@@ -352,7 +352,7 @@ class LDB
  * @author Cody Roodaka <roodakazo@gmail.com>
  * @access private
  */
-class LDB_Result
+class Database_Result
  {
   /**
    * Recurso MySQL
@@ -459,4 +459,4 @@ class LDB_Result
  * @author Cody Roodaka <roodakazo@gmail.com>
  * @access private
  */
-class LDB_Exception Extends \Exception { }
+class Database_Exception Extends \Exception { }

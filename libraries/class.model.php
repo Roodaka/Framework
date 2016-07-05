@@ -109,7 +109,7 @@ abstract class Model
         // forma insertamos
         if($this->id !== null)
          {
-          return LDB::update($this->table, $fields, array($this->primary_key => $this->id));
+          return \Framework\Database::update($this->table, $fields, array($this->primary_key => $this->id));
          }
         else
          {
@@ -140,7 +140,7 @@ abstract class Model
        }
       elseif(isset($this->data[$field]) === false)
        {
-        $query = LDB::select($this->table, $field, array($this->primary_key => $this->id));
+        $query = \Framework\Database::select($this->table, $field, array($this->primary_key => $this->id));
         return ($query !== false) ? $query[$field] : false;
        }
       else
@@ -205,7 +205,7 @@ abstract class Model
    */
   protected function load_data()
    {
-    $temp = LDB::select($this->table, (($this->specified_fields === null) ? $this->fields : array_intersect($this->specified_fields, $this->fields)), array($this->primary_key => $this->id));
+    $temp = \Framework\Database::select($this->table, (($this->specified_fields === null) ? $this->fields : array_intersect($this->specified_fields, $this->fields)), array($this->primary_key => $this->id));
     if($temp !== false)
      {
       $this->data = $temp->fetch();
@@ -252,7 +252,7 @@ abstract class Model
    */
   final public function set_id_by_key($key, $value)
    {
-    $temp = LDB::select($this->table, $this->primary_key, array($key => $value));
+    $temp = \Framework\Database::select($this->table, $this->primary_key, array($key => $value));
     if($temp !== false)
      {
       $temp = $temp->fetch();
@@ -315,7 +315,7 @@ abstract class Model
    */
   final public function count($condition = null)
    {
-    $query = \Framework\LDB::select($this->table, 'COUNT(DISTINCT('.$this->primary_key.')) AS total', $condition);
+    $query = \Framework\Database::select($this->table, 'COUNT(DISTINCT('.$this->primary_key.')) AS total', $condition);
     if($query !== false)
      {
       return $query->fetch('total');
@@ -332,7 +332,7 @@ abstract class Model
    */
   final public function save()
    {
-    $id = LDB::insert($this->table, $this->data);
+    $id = \Framework\Database::insert($this->table, $this->data);
     if(is_int($id) === true)
      {
       $this->id = $id;
@@ -352,7 +352,7 @@ abstract class Model
    */
   protected function delete()
    {
-    return LDB::delete($this->table, array($this->primary_key => $this->id));
+    return \Framework\Database::delete($this->table, array($this->primary_key => $this->id));
    }
  } // class Model();
 
