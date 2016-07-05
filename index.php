@@ -1,9 +1,9 @@
 <?php
 
-define('DEV', true); // Modo Desarrollo
+define('DEVELOPER_MODE', true);
 
 // Mostramos los errores sólo si el modo desarrollo está activo.
-if(DEV === true)
+if(DEVELOPER_MODE === true)
  {
   error_reporting(E_ALL);
   ini_set('display_errors', true);
@@ -16,7 +16,7 @@ else
   error_reporting(0);
   ini_set('display_errors', false);
  }
-
+ 
 // Directorios
 define('DS', DIRECTORY_SEPARATOR); // Un mero alias
 define('EXT', '.php');
@@ -27,6 +27,8 @@ define('FUNCTIONS_DIR', ROOT.'functions'.DS);
 define('LIBRARIES_DIR', ROOT.'libraries'.DS);
 define('MODELS_DIR', ROOT.'models'.DS);
 define('VIEWS_DIR', ROOT.'views'.DS);
+// Estados del framework
+define('ENABLE_SEO', false);
 
 // Cargamos las funciones básicas del núcleo
 require(FUNCTIONS_DIR.'core'.EXT);
@@ -42,8 +44,8 @@ set_exception_handler('exception_handler');
 require_once(LIBRARIES_DIR.'class.configuration'.EXT);
 \Framework\Configuration::init();
 
-require_once(LIBRARIES_DIR.'class.ldb'.EXT);
-\Framework\LDB::init();
+require_once(LIBRARIES_DIR.'class.database'.EXT);
+\Framework\Database::init();
 \Framework\Configuration::load_from_db();
 
 require_once(LIBRARIES_DIR.'class.controller'.EXT);
