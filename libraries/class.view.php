@@ -160,10 +160,6 @@ final class View
     if(count(self::$templates) >= 1)
      {
       $dir_theme = 'views'.DS.'html'.DS;
-      $dir_base = explode('/', $_SERVER['REQUEST_URI']);
-      array_shift($dir_base);
-      array_pop($dir_base);
-      $dir_base = '/'.implode('/', $dir_base).'/';
 
       self::add_key('site', get_config('site'));
       self::add_key('core_files', self::$files);
@@ -173,7 +169,7 @@ final class View
       $rain = new Third_Party\RainTPL();
 
       // Configuramos Rain para trabajar
-      Third_Party\raintpl::configure('base_url', $_SERVER['SERVER_NAME'].$dir_base);
+      Third_Party\raintpl::configure('base_url', \Framework\Core::$url_fullpath);
       Third_Party\raintpl::configure('tpl_dir', 'views'.DS.'html'.DS);
       Third_Party\raintpl::configure('cache_dir', VIEWS_DIR.'cached'.DS);
 
