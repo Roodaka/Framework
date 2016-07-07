@@ -165,7 +165,7 @@ final class View
       self::add_key('core_files', self::$files);
 
       // Instanciamos RainTPL
-      load_third_party('raintpl');
+      require_once(LIBRARIES_DIR.'third_party/class.raintpl'.EXT);
       $rain = new Third_Party\RainTPL();
 
       // Configuramos Rain para trabajar
