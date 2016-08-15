@@ -79,7 +79,7 @@ final class Core
     $path = explode('/', $_SERVER['REQUEST_URI']);
     array_shift($path);
     array_pop($path);
-    self::$url_fullpath = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].'/'.implode('/', $path).'/';
+    self::$url_fullpath = ((isset($_SERVER['REQUEST_SCHEME'])) ? $_SERVER['REQUEST_SCHEME'] : 'http').'://'.$_SERVER['HTTP_HOST'].'/'.implode('/', $path).'/';
 
     // Cargamos configuraciones del sitio y las preferencias del usuario
     self::route();
@@ -198,8 +198,17 @@ final class Core
    {
     if(self::is_valid_route($controller, $method) === false)
      {
-      $new_route = self::$error_routes;
+      $new_route = self::$config['error_route'];
      }
+    else
+     {
+      $new_route = array(
+       'controller' => $controller,
+       'method' => $method,
+       'value' => $value,
+       'page' => $page);
+     }
+    
 
     if($http_redirection === false)
      {
@@ -222,7 +231,7 @@ final class Core
   private static function is_valid_route($controller, $method = null)
    {
     $controller = strtolower($controller);
-    $method = ($method === null) ? self::$default_routing['method'] : $method;
+    $method = ($method === null) ? self::$config['default_route']['method'] : $method;
 
     if(isset(self::$avaiable_controllers[$controller]) === false)
      {
