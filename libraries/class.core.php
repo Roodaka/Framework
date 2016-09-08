@@ -76,7 +76,7 @@ final class Core
 
     self::$avaiable_controllers = get_config('routes');
 
-    $path = explode('/', $_SERVER['REQUEST_URI']);
+    $path = explode('/', $_SERVER['SCRIPT_NAME']);
     array_shift($path);
     array_pop($path);
     self::$url_fullpath = ((isset($_SERVER['REQUEST_SCHEME'])) ? $_SERVER['REQUEST_SCHEME'] : 'http').'://'.$_SERVER['HTTP_HOST'].'/'.implode('/', $path).'/';
