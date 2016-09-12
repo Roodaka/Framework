@@ -1,6 +1,6 @@
 // TODO ========================================================================
-Optimizar Paginado
-Terminar subida segura de im·genes ?
-Reescribir RainTPL 
-Implementar Iteraciones en Query ?
+Optimizar e Integrar clase de Paginado
+Crear nuevo Template Manager.
+Implementar ORM.
 Implementar Uploader de archivos.
+Implementar Cach√© Global.
