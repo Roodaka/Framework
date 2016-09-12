@@ -154,6 +154,7 @@ final class Core
     $controller = new $class($redirected);
     if(get_parent_class($controller) === 'Framework\Controller')
      {
+      call_user_func_array(array($controller, 'build_header'), array());
       call_user_func_array(array($controller, self::$target_routing['method']), array());
      }
     else

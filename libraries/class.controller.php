@@ -50,36 +50,31 @@ abstract class Controller
   protected $files_count = 0;
   /**
    * Constructor del controlador.
-   * Asigna las variables POST y FILE y llama a la función build_header();
+   * Asigna las variables POST y FILE.
    * @param boolean $ignore_post Ignorar o no las peticiones POST (por redireccionamiento interno)
    * @return nothing
    */
   public function __construct($ignore_post = false)
    {
-    if($ignore_post === false)
+    if($ignore_post === false AND $_SERVER['REQUEST_METHOD'] === 'POST')
      {
-      if($_SERVER['REQUEST_METHOD'] === 'POST')
+      require(LIBRARIES_DIR.'utils'.DS.'class.post_value'.EXT);
+      $this->is_post = true;
+
+      foreach($_POST as $key => $value)
        {
-        require(LIBRARIES_DIR.'utils'.DS.'class.post_value'.EXT);
-        $this->is_post = true;
+        $this->post[$key] = new Post_Value($value);
+       }
+      $this->post_count = count($this->post);
 
-        foreach($_POST as $key => $value)
-         {
-          $this->post[$key] = new Post_Value($value);
-         }
-        $this->post_count = count($this->post);
-
- 
-        if(isset($_FILES) === true)
-         {
-          $this->has_files = true;
-          $this->files = (array) $_FILES;
-          $this->files_count = count($_FILES);
-         }
+      if(isset($_FILES) === true)
+       {
+        $this->has_files = true;
+        $this->files = (array) $_FILES;
+        $this->files_count = count($_FILES);
        }
      }
-    $this->build_header();
-   } // protected function __construct();
+   }
 
   /**
    * Convertimos la clase una cadena
@@ -88,7 +83,7 @@ abstract class Controller
   public function __toString()
    {
     return 'Controlador '.get_called_class();
-   } // protected function __toString();
+   }
 
 
 
@@ -99,7 +94,7 @@ abstract class Controller
   public function __invoke()
    {
     return $this->main();
-   } // public function __invoke();
+   }
 
 
 
@@ -110,7 +105,7 @@ abstract class Controller
   public function __clone()
    {
     throw new Controller_Exception('No se permite clonar este objeto '.$this.'.');
-   } // protected function __clone();
+   }
 
 
 
@@ -119,7 +114,7 @@ abstract class Controller
    * controlador. Debe llamarse antes del método Main();
    * @return mixed
    */
-  public function build_header() {} // abstract protected function build_header();
+  abstract public function build_header();
 
 
 
@@ -127,7 +122,7 @@ abstract class Controller
    * Método predeterminado, es llamado cuando no hay una función especificada.
    * @return mixed
    */
-  abstract protected function main(); // abstract protected function main()
+  abstract protected function main();
  } // class Controller
 
 
