@@ -27,7 +27,7 @@ class SecureHash
     // fallback encryption
     if (!function_exists('hash') || !in_array('sha512', hash_algos()))
      {
-      throw new SecureHash_Exception('You must have the PHP PECL hash module installed or use PHP 5.1.2+');
+      throw new SecureHash_Exception('M&oacute;dulo de HASH PHP PECL inexistente o versi&oacute;n de PHP inferior a 5.1.2.');
      }
     return $this->_create_hash($password, $salt);
    }
