@@ -3,7 +3,7 @@
  * Abstracción de Controladores
  * @package class.controller.php
  * @author Cody Roodaka <roodakazo@gmail.com>
- * @version  $Revision: 0.0.1
+ * @version  $Revision: 0.0.3
  * @access public
  */
 
@@ -13,33 +13,69 @@ defined('ROOT') or exit('No tienes Permitido el acceso.');
 
 abstract class Controller
  {
+  /*
+   * Variable aún sin utilizar
+   * @var boolean
+   */
   protected $permisson_required = null;
-
+  /*
+   * Indica si existe una petición POSTs
+   * @var boolean
+   */
   protected $is_post = false;
+  /*
+   * Almacena las variables POST como objetos Post_Value
+   * @var array
+   */
   protected $post = array();
+  /*
+   * Indica la cantidad de variables POST
+   * @var integer
+   */
   protected $post_count = 0;
-
+  /*
+   * Indica si se han adjuntado archivos vía POST
+   * @var boolean
+   */
   protected $has_files = false;
+  /*
+   * Alias a _FILES
+   * @var array
+   */
   protected $files = array();
+  /*
+   * Conteo de variables en $this->files
+   * @var integer
+   */
   protected $files_count = 0;
-
-
-
+  /**
+   * Constructor del controlador.
+   * Asigna las variables POST y FILE y llama a la función build_header();
+   * @param boolean $ignore_post Ignorar o no las peticiones POST (por redireccionamiento interno)
+   * @return nothing
+   */
   public function __construct($ignore_post = false)
    {
     if($ignore_post === false)
      {
       if($_SERVER['REQUEST_METHOD'] === 'POST')
        {
+        require(LIBRARIES_DIR.'utils'.DS.'class.post_value'.EXT);
         $this->is_post = true;
-        $this->post = (array) $_POST;
-        $this->post_count = count($_POST);
-       }
-      if(isset($_FILES) === true)
-       {
-        $this->has_files = true;
-        $this->files = (array) $_FILES;
-        $this->files_count = count($_FILES);
+
+        foreach($_POST as $key => $value)
+         {
+          $this->post[$key] = new Post_Value($value);
+         }
+        $this->post_count = count($this->post);
+
+ 
+        if(isset($_FILES) === true)
+         {
+          $this->has_files = true;
+          $this->files = (array) $_FILES;
+          $this->files_count = count($_FILES);
+         }
        }
      }
     $this->build_header();
@@ -73,7 +109,7 @@ abstract class Controller
    */
   public function __clone()
    {
-    throw new Controller_Exception('No se permite clonar este objeto '.$this->name.'.');
+    throw new Controller_Exception('No se permite clonar este objeto '.$this.'.');
    } // protected function __clone();
 
 
@@ -81,7 +117,7 @@ abstract class Controller
   /**
    * Procesar los datos hasta ahora obtenidos, preparando el contexto del
    * controlador. Debe llamarse antes del método Main();
-   * @return nothing
+   * @return mixed
    */
   public function build_header() {} // abstract protected function build_header();
 
@@ -89,7 +125,7 @@ abstract class Controller
 
   /**
    * Método predeterminado, es llamado cuando no hay una función especificada.
-   * @return boolean
+   * @return mixed
    */
   abstract protected function main(); // abstract protected function main()
  } // class Controller
