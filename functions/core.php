@@ -68,14 +68,25 @@ function paginate($page, $limit)
 function exception_handler($exception)
  {
   echo '<div>
-   <h4>'
+   <h3>'
     .str_replace('Framework\\', '', str_replace('_Exception', '', get_class($exception)))
     .' Error: '.$exception->getMessage()
-   .'</h4>
-   <p><b>File</b>: '.str_replace(ROOT, 'HOME_DIR'.DS, $exception->getFile()).'</p>
-   <p><b>Trace</b>: '.str_replace(ROOT, 'HOME_DIR'.DS, $exception->getTraceAsString()).'</p>
-  </div>';
- } // function exception_handler();
+   .'</h3>
+   <p><strong>Source</strong>: '.str_replace(ROOT, 'HOME_DIR'.DS, $exception->getFile()).' at <strong>line '.$exception->getLine().'</strong></p>
+   <p><h4>Trace:</h4>';
+
+   $last_file = 'HOME_DIR'.DS;
+   $last_line = 0;
+   foreach($exception->getTrace() as $trace)
+    {
+     $last_file = isset($trace['file']) ? $trace['file'] : $last_file;
+     $last_line = isset($trace['line']) ? $trace['line'] : $last_line;
+     echo '<span>'.str_replace(ROOT, 'HOME_DIR'.DS, $last_file)
+     .((isset($trace['class']) && isset($trace['type'])) ? $trace['class'].$trace['type'] : '').$trace['function']
+     .'('.((DEVELOPER_MODE === true) ? '<i>'.json_encode($trace['args']).'</i>' : '').')</span> on <strong>line '.$last_line.'</strong><br />';
+    }
+   echo '</p></div>';
+ }
 
 
 
