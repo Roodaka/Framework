@@ -48,6 +48,9 @@ require_once(LIBRARIES_DIR.'class.database'.EXT);
 \Framework\Database::init();
 \Framework\Configuration::load_from_db();
 
+require_once(LIBRARIES_DIR.'class.cache'.EXT);
+\Framework\Cache::init();
+
 require_once(LIBRARIES_DIR.'class.controller'.EXT);
 
 require_once(LIBRARIES_DIR.'class.factory'.EXT);
