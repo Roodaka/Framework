@@ -2,28 +2,32 @@
 
 namespace Framework\Controllers;
 
-use \Framework as F;
-
 defined('ROOT') or exit('No tienes Permitido el acceso.');
 
-class Home Extends F\Controller
+class Home Extends \Framework\Controller
  {
 
   public function build_header()
    {
-    F\View::add_key('title', 'asd');
-    F\View::add_file('css', 'asd.js'); // Agregamos un archivo aleatorio
+    \Framework\View::add_key('title', 'asd');
+    \Framework\View::add_file('css', 'asd.js'); // Agregamos un archivo aleatorio
    }
 
 
 
   public function main()
    {
-    $result = F\Factory::create_from_database('Example', null, 'name', 10, true);
+    $users = \Framework\Cache::get('main_users');
+    if($users === false)
+     {
+      $users = \Framework\Factory::create_from_database('Example', null, 'name', 10, true);
+      \Framework\Cache::set('main_users', $users);
+     }
+    
 
-    F\View::add_key('users', $result);
+    \Framework\View::add_key('users', $users);
 
-    F\View::add_template('home');
+    \Framework\View::add_template('home');
     //return Framework\Core::redirect('Other');
    }
 
@@ -40,17 +44,17 @@ class Home Extends F\Controller
        {
         $user->name = $this->post['name'];
         $user->lastname = $this->post['lastname'];
-        return F\Core::redirect('home', 'main');
+        return \Framework\Core::redirect('home', 'main');
        }
       else
        {
-        F\View::add_key('user', $user->get_array());
-        F\View::add_template('edit');
+        \Framework\View::add_key('user', $user->get_array());
+        \Framework\View::add_template('edit');
        }
      }
     else
      {
-      return F\Core::redirect('home', 'main');
+      return \Framework\Core::redirect('home', 'main');
      }
    }
 
@@ -67,12 +71,12 @@ class Home Extends F\Controller
 
       if($new_user->save() === true)
        {
-        F\Core::redirect('home', 'main');
+        \Framework\Core::redirect('home', 'main');
        }
      }
     else
      {
-      F\View::add_template('create');
+      \Framework\View::add_template('create');
      }
    }
 
@@ -86,6 +90,14 @@ class Home Extends F\Controller
       $user = load_model('Example', (int) $id, null, true);
       $user->set_to_delete();
      }
-    return F\Core::redirect('home', 'main');
+    return \Framework\Core::redirect('home', 'main');
+   }
+
+
+
+  public function clear()
+   {
+    \Framework\Cache::clear();
+    return \Framework\Core::redirect('home', 'main');
    }
  } // class Home Extends Controller

@@ -4,6 +4,7 @@ return array(
   'main' => false,
   'edit' => false,
   'create' => false,
+  'clear' => false,
   'delete' => false),
  'error' => array('main' => false),
  );
