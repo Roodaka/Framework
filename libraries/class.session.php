@@ -137,6 +137,43 @@ final class Session
 
 
   /**
+   * Generar un token para CSRF.
+   * @param string $form Nombre del formulario.
+   * @return string Token para el formulario solicitado
+   */
+  public static function generate_token($form)
+   {
+    $tohash = ((self::$user !== null) ? self::$user->id : '').time().$form;
+    $tohash = hash(self::$configuration['algorithm'], $tohash);
+    $_SESSION[self::$configuration['csrf_variable'].'_'.$form] = $tohash;
+
+    return $tohash;
+   }
+
+
+
+  /**
+   * Validar un token
+   * @return boolean Resultado
+   */
+  public static function validate_token($form, $token)
+   {
+    $name = self::$configuration['csrf_variable'].'_'.$form;
+    echo '_validate';
+    if(isset($_SESSION[$name]))
+     {
+      echo '_isset';
+      $original_token = $_SESSION[$name];
+      unset($_SESSION[$name]);
+      var_dump($token,$original_token);
+      return ($token === $original_token);
+     }
+    return false;
+   }
+
+
+
+  /**
    * Terminamos la sesión.
    * @return Nothing
    */

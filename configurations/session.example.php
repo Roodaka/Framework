@@ -17,5 +17,7 @@ return array(
  'cookie_life' => 300, // cinco minutos
  'cookie_name' => 'rdk_framework',
  'cookie_path' => DS,
- 'cookie_domain' => $_SERVER['SERVER_NAME']
+ 'cookie_domain' => $_SERVER['SERVER_NAME'],
+
+ 'csrf_variable' => 'framework_token'
  );
