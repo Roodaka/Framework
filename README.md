@@ -16,12 +16,6 @@ Muchos de los framework que he utilizado son pesados e incluso poseen una estruc
  * Autocarga de configuraciones desde la base de datos
  * Librería de Cache ([APC](http://php.net/apc) y basada en archivos, se espera extender la compatibilidad pronto).
 
-## Problemas conocidos & Reporte de bugs/Recomendaciones
-Por favor visitar el [issue tracker de este repositorio](https://github.com/Roodaka/Framework/issues) para conocer los errores del código actuales.
-
-## Trabajando con el framework
-Visite la [Wiki](https://github.com/Roodaka/Framework/wiki) para más información (W.I.P.).
-
 ## Objetivos para el desarrollo futuro
  * Gestor de plantillas propio.
  * Librerías oAuth, IPN (PayPal).
@@ -29,6 +23,16 @@ Visite la [Wiki](https://github.com/Roodaka/Framework/wiki) para más informaci�
  * Mejorar el manejo de excepciones.
  * Extender la librería de Cache para compatibilidad con [Memcached](http://php.net/manual/en/book.memcached.php).
  * Integración de Composer.
+
+## Problemas conocidos & Reporte de bugs/Recomendaciones
+Por favor visitar el [issue tracker de este repositorio](https://github.com/Roodaka/Framework/issues) para conocer los problemas actuales del sistema.
+
+## Trabajando con el framework
+Visite la [Wiki](https://github.com/Roodaka/Framework/wiki) para más información.
+
+## Requisitos del sistema
+ * PHP 5.6+
+ * Webserver, Apache o nginx
 
 ## Software de terceros
  * [RainTPL](https://github.com/feulf/raintpl) de Federico Ulfo.

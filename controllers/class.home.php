@@ -62,20 +62,25 @@ class Home Extends \Framework\Controller
 
   public function create()
    {
-    if($this->post_count >= 2)
+    if($this->is_post === true)
      {
-      $new_user = load_model('Example');
-      $new_user->name = $this->post['name'];
-      $new_user->lastname = $this->post['lastname'];
-      $new_user->datetime = time();
-
-      if($new_user->save() === true)
+      // Protección CSRF
+      if(\Framework\Session::validate_token('create_user', (string) $this->post['token']) === true)
        {
-        \Framework\Core::redirect('home', 'main');
+        $new_user = load_model('Example');
+        $new_user->name = $this->post['name'];
+        $new_user->lastname = $this->post['lastname'];
+        $new_user->datetime = time();
+
+        if($new_user->save() === true)
+         {
+          \Framework\Core::redirect('home', 'main');
+         }
        }
      }
     else
      {
+      \Framework\View::add_key('token', \Framework\Session::generate_token('create_user'));
       \Framework\View::add_template('create');
      }
    }

@@ -1,7 +1,7 @@
 <?php defined('ROOT') or exit('No tienes Permitido el acceso.');
 return array(
  // Modo de trabajo del cache.
- 'mode' => 'apc',
+ 'mode' => 'file',
  // Directorio donde se encuentran los distintos handlers de cache
  'handlers_directory' => LIBRARIES_DIR.'cache_handlers'.DS,
  // Duración por defecto del cache (en segundos).
