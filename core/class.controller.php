@@ -58,7 +58,7 @@ abstract class Controller
    {
     if($ignore_post === false AND $_SERVER['REQUEST_METHOD'] === 'POST')
      {
-      require(LIBRARIES_DIR.'utils'.DS.'class.post_value'.EXT);
+      require(CORE_DIR.'utils'.DS.'class.post_value'.EXT);
       $this->is_post = true;
 
       foreach($_POST as $key => $value)

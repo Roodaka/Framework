@@ -101,7 +101,7 @@ final class View
    */
   private static function load_language($lang = 'spanish')
    {
-    $directory = VIEWS_DIR.'languages'.DS;
+    $directory = DATA_DIR.'languages'.DS;
     if(is_dir($directory) === true)
      {
       if(is_file($directory.strtolower($lang).'.json'))
@@ -159,19 +159,19 @@ final class View
    {
     if(count(self::$templates) >= 1)
      {
-      $dir_theme = 'views'.DS.'html'.DS;
+      $dir_theme = 'data'.DS.'html'.DS;
 
       self::add_key('site', get_config('site'));
       self::add_key('core_files', self::$files);
 
       // Instanciamos RainTPL
-      require_once(LIBRARIES_DIR.'third_party/class.raintpl'.EXT);
+      require_once(CORE_DIR.'utils'.DS.'class.raintpl'.EXT);
       $rain = new Third_Party\RainTPL();
 
       // Configuramos Rain para trabajar
       Third_Party\raintpl::configure('base_url', \Framework\Core::$url_fullpath);
-      Third_Party\raintpl::configure('tpl_dir', 'views'.DS.'html'.DS);
-      Third_Party\raintpl::configure('cache_dir', VIEWS_DIR.'cached'.DS);
+      Third_Party\raintpl::configure('tpl_dir', 'data'.DS.'html'.DS);
+      Third_Party\raintpl::configure('cache_dir', DATA_DIR.'cached'.DS.'views'.DS);
 
       $rain->assign('lang', self::load_language(self::$configuration['lang']));
       $rain->assign(self::$variables);
