@@ -27,8 +27,16 @@ Visite la [Wiki](https://github.com/Roodaka/Framework/wiki) para más informaci�
  * Librerías oAuth, IPN (PayPal).
  * Capa de seguridad en subida de archivos.
  * Mejorar el manejo de excepciones.
- * Extender la librería de Cache para compatibilidad con Memcached y xCache.
+ * Extender la librería de Cache para compatibilidad con [Memcached](http://php.net/manual/en/book.memcached.php).
  * Integración de Composer.
+
+## Software de terceros
+ * [RainTPL](https://github.com/feulf/raintpl) de Federico Ulfo.
+ * [SecureHash](http://blackbe.lt/secure-php-authentication-bcrypt/) de Corey Ballou.
+
+## Colaboradores y amigos
+ * [Alexander Eberle](https://github.com/alexander171294/).
+ * [Ignacio Daniel Rostagno](https://github.com/areslepra).
 
 ## Licencia Apache v2.0
 Unless otherwise noted, LEAP is licensed under the Apache License, Version 2.0 (the "License"); you may not use these files except in
@@ -41,7 +49,3 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 and limitations under the License.
 
 Copyright © 2014–2016 [Cody Roodaka](http://twitter.com/roodaka)
-
-## Software de terceros:
- * [RainTPL](https://github.com/feulf/raintpl) de Federico Ulfo.
- * [SecureHash](http://blackbe.lt/secure-php-authentication-bcrypt/) de Corey Ballou.
