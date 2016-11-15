@@ -60,8 +60,15 @@ class APC Extends \Framework\Cache\Base
 
 
 
-  public function clear()
+  public function clear($name = '' )
    {
-    return apc_clear_cache('user') && apc_clear_cache();
+    if(!empty($name))
+     {
+      return apc_delete($name);
+     }
+    else
+     {
+      return apc_clear_cache('user') && apc_clear_cache();
+     }
    }
  }

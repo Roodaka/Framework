@@ -109,8 +109,12 @@ class File Extends \Framework\Cache\Base
 
 
 
-  public function clear()
+  public function clear($name = '')
    {
+    if(!empty($name))
+     {
+      return unlink($this->configuration['cache_dir'].$name.EXT);
+     }
     $dir = opendir($this->configuration['cache_dir']);
     if(!$dir)
      {

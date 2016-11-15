@@ -107,10 +107,11 @@ class Cache
 
 
   /**
-   * Borrar todos los datos cacheados.
+   * Borrar una variable cacheada, de no argumentar ninguna, se borrará todo el cache.
+   * @param string $name Nombre de la variable cacheada a borrar.
    * @return boolean
    */
-  public static function clear()
+  public static function clear($name = '')
    {
     if(self::$handler !== null)
      {

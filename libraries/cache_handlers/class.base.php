@@ -40,7 +40,8 @@ abstract class Base
   abstract public function size();
   /**
    * Solicitar limpieza del Cache.
+   * @param string $name Opcional, limitar el borrado a una variable.
    * @return boolean
    */
-  abstract public function clear();
+  abstract public function clear($name = '');
  }
