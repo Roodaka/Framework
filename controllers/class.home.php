@@ -74,6 +74,7 @@ class Home Extends \Framework\Controller
 
         if($new_user->save() === true)
          {
+          \Framework\Cache::clear('main_users');
           \Framework\Core::redirect('home', 'main');
          }
        }
