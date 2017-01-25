@@ -87,7 +87,11 @@ class Database
   public static function query($raw_query, $values = null, $auto_fetch = false)
    {
     $query = self::do_query(($values != null) ? self::parse_vars($raw_query, $values) : $raw_query);
-    if($query !== false)
+    if(is_bool($query) === true)
+     {
+      return $query;
+     }
+    elseif(is_object($query) === true)
      {
       $query = new \Framework\Database_Result($query);
       return ($auto_fetch === true) ? $query->fetch() : $query;
@@ -389,7 +393,7 @@ class Database_Result
    */
   public function __construct($resource)
    {
-    if(is_object($resource))
+    if(is_object($resource) === true)
      {
       $this->resource = $resource;
       $this->position = 0;

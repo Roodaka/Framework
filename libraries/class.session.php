@@ -93,7 +93,7 @@ final class Session
 
       \Framework\Database::query('INSERT INTO '.self::$configuration['mysql']['table'].' ('.self::$configuration['mysql']['field_hash'].', '.self::$configuration['mysql']['field_user'].', '.self::$configuration['mysql']['field_time'].', '.self::$configuration['mysql']['field_cookies'].')
        VALUES (\''.self::$hash.'\', '.$id.', '.$_SESSION['datetime'].', '.(int) $cookies
-       .') ON DUPLICATE KEY UPDATE '.self::$configuration['mysql']['field_time'].' = '.$_SESSION['datetime'].', '.self::$configuration['mysql']['field_cookies'].' = '.(int) $cookies, null, true);
+       .') ON DUPLICATE KEY UPDATE '.self::$configuration['mysql']['field_time'].' = '.$_SESSION['datetime'].', '.self::$configuration['mysql']['field_cookies'].' = '.(int) $cookies, null, false);
 
       return self::set_user_object($id);
      }

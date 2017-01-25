@@ -132,25 +132,18 @@ abstract class Model
    */
   final public function __get($field)
    {
-    if($field !== $this->primary_key)
+    if(in_array($field, $this->fields))
      {
-      if(in_array($field, $this->fields))
-       {
-        return $this->data[$field];
-       }
-      elseif(isset($this->data[$field]) === false)
-       {
-        $query = \Framework\Database::select($this->table, $field, array($this->primary_key => $this->id));
-        return ($query !== false) ? $query[$field] : false;
-       }
-      else
-       {
-        throw new Model_Exception('El campo "'.$field.'" no se encuentra entre los campos predefinidos');
-       }
+      return $this->data[$field];
+     }
+    elseif(isset($this->data[$field]) === false)
+     {
+      $query = \Framework\Database::select($this->table, $field, array($this->primary_key => $this->id));
+      return ($query !== false) ? $query[$field] : false;
      }
     else
      {
-      return $this->id;
+      throw new Model_Exception('El campo "'.$field.'" no se encuentra entre los campos predefinidos');
      }
    } // final public function __get();
 
