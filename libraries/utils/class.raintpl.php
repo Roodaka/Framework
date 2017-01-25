@@ -9,7 +9,7 @@
  *  @version 2.7.2
  */
 
-namespace Framework\Third_Party;
+namespace Framework\Utils;
 defined('ROOT') or exit('No tienes Permitido el acceso.');
 
 class RainTPL{

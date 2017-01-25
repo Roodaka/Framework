@@ -7,7 +7,7 @@
  * @access public
  */
 
-namespace Framework;
+namespace Framework\Utils;
 
 defined('ROOT') or exit('No tienes Permitido el acceso.');
 
