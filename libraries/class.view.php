@@ -45,6 +45,11 @@ final class View
   final public static function init()
    {
     self::$configuration = get_config('view');
+
+    if(self::$configuration['start_with'] !== null)
+     {
+      self::$templates[] = self::$configuration['start_with'];
+     }
    }
 
 
@@ -159,27 +164,25 @@ final class View
    {
     if(count(self::$templates) >= 1)
      {
-      $dir_theme = 'data'.DS.'html'.DS;
-
-      self::add_key('site', get_config('site'));
+      self::add_key(self::$configuration['site_configuration_variable'], get_config('site'));
       self::add_key('core_files', self::$files);
 
       // Instanciamos RainTPL
       require_once(LIBRARIES_DIR.'utils'.DS.'class.raintpl'.EXT);
-      $rain = new Third_Party\RainTPL();
+      $rain = new Utils\RainTPL();
 
       // Configuramos Rain para trabajar
-      Third_Party\raintpl::configure('base_url', \Framework\Core::$url_fullpath);
-      Third_Party\raintpl::configure('tpl_dir', 'views'.DS.'html'.DS);
-      Third_Party\raintpl::configure('cache_dir', VIEWS_DIR.'cached'.DS.'templates'.DS);
+      Utils\raintpl::configure('base_url', \Framework\Core::$url_fullpath);
+      Utils\raintpl::configure('tpl_dir', 'data'.DS.'html'.DS);
+      Utils\raintpl::configure('cache_dir', VIEWS_DIR.'cached'.DS.'templates'.DS);
 
       $rain->assign('lang', self::load_language(self::$configuration['lang']));
       $rain->assign(self::$variables);
 
 
-      if(self::$configuration['start_with'] !== null)
+      if(self::$configuration['end_with'] !== null)
        {
-        $rain->draw(self::$configuration['start_with'], false);
+        self::$templates[] = self::$configuration['end_with'];
        }
 
       // Recorremos el arreglo de plantillas y las vamos mostrando
@@ -187,10 +190,7 @@ final class View
        {
         $rain->draw($template, false);
        }
-      if(self::$configuration['end_with'] !== null)
-       {
-        $rain->draw(self::$configuration['end_with'], false);
-       }
+
      }
     else // Consideramos una respuesta AJAX.
      {
