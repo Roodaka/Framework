@@ -23,6 +23,7 @@ Muchos de los framework que he utilizado son pesados e incluso poseen una estruc
  * Mejorar el manejo de excepciones.
  * Extender la librería de Cache para compatibilidad con [Memcached](http://php.net/manual/en/book.memcached.php).
  * Integración de Composer.
+ * Extender librería Database para compatibilidad con otros DBM.
 
 ## Problemas conocidos & Reporte de bugs/Recomendaciones
 Por favor visitar el [issue tracker de este repositorio](https://github.com/Roodaka/Framework/issues) para conocer los problemas actuales del sistema.
@@ -38,10 +39,6 @@ Visite la [Wiki](https://github.com/Roodaka/Framework/wiki) para más informaci�
  * [RainTPL](https://github.com/feulf/raintpl) de Federico Ulfo.
  * [SecureHash](http://blackbe.lt/secure-php-authentication-bcrypt/) de Corey Ballou.
 
-## Colaboradores y amigos
- * [Alexander Eberle](https://github.com/alexander171294/).
- * [Ignacio Daniel Rostagno](https://github.com/areslepra).
-
 ## Licencia Apache v2.0
 Unless otherwise noted, LEAP is licensed under the Apache License, Version 2.0 (the "License"); you may not use these files except in
 compliance with the License. You may obtain a copy of the License at:
@@ -52,4 +49,4 @@ Unless required by applicable law or agreed to in writing, software distributed 
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
 and limitations under the License.
 
-Copyright © 2014–2016 [Cody Roodaka](http://twitter.com/roodaka)
+Copyright © 2014–2017 [Cody Roodaka](http://twitter.com/roodaka)
