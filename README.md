@@ -1,4 +1,4 @@
-#Roodaka/Framework
+##Roodaka/Framework
 Una estructura MVC Minimizada que contiene las herramientas básicas necesarias para el Desarrollo Web 3.0.
 
 ## Motivación 
@@ -7,23 +7,24 @@ Muchos de los framework que he utilizado son pesados e incluso poseen una estruc
 ## Capacidades
  * Carga automática según ruta vía variables $_GET
  * Manejo de idiomas desde plantillas (RainTPL)
- * Ligero y simple de usar
  * Implementa MySQLi - Patrón creacional Factory
  * Gestor de Plantillas ajustado para compatibilidad con AJAX.
- * Seguridad extendida en Sesiones (Sesiones PHP, Cookies & CSRF).
+ * Seguridad extendida en Sesiones (Sesiones PHP & Cookies).
  * Capa de seguridad en variables $_POST
  * Generador de Hash para contraseñas.
  * Autocarga de configuraciones desde la base de datos
- * Librería de Cache ([APC](http://php.net/apc) y basada en archivos, se espera extender la compatibilidad pronto).
+ * Librería de Cache ([APC](http://php.net/apc) y basada en archivos).
 
 ## Objetivos para el desarrollo futuro
+ * Cacheo profundo de vistas y datos, coordinados con la ruta.
  * Gestor de plantillas propio.
  * Librerías oAuth, IPN (PayPal).
  * Capa de seguridad en subida de archivos.
- * Mejorar el manejo de excepciones.
+ * Seguridad en formularios (CSRF).
+ * Mejorar el manejo de excepciones y errores.
  * Extender la librería de Cache para compatibilidad con [Memcached](http://php.net/manual/en/book.memcached.php).
  * Integración de Composer.
- * Extender librería Database para compatibilidad con otros DBM.
+ * Extender librería Database para compatibilidad con otros DBM / Múltiples conexiones.
 
 ## Problemas conocidos & Reporte de bugs/Recomendaciones
 Por favor visitar el [issue tracker de este repositorio](https://github.com/Roodaka/Framework/issues) para conocer los problemas actuales del sistema.
