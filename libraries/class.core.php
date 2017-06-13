@@ -49,19 +49,25 @@ final class Core
    * @var string
    */
   public static $url_fullpath = null;
+  /**
+   * Código de error actual
+   * @var integer
+   */
+  public static $error_code = null;
 
   // Constantes que definen los errores en la carga del controlador
-  const ROUTING_ERROR_CONTEXT = 'routing_error_context';
-  const ROUTING_ERROR_FILE = 'routing_error_file';
-  const ROUTING_ERROR_CONTROLLER = 'routing_error_controller';
-  const ROUTING_ERROR_METHOD = 'routing_error_method';
+  const ERROR_CONTEXT = 1; // El contexto no permite el uso de este controlador (sin utilizar aún)
+  const ERROR_FILE = 2; // No se encuentra el archivo del controlador
+  const ERROR_MISSING_ROUTE = 3; // Controlador o método fuera del listado de rutas.
+  const ERROR_INVALID_ROUTE = 4; // Controlador o método indefinido.
+  const ERROR_LOOP = 6; // Se ha alcanzado el número máximo de redirecciones
 
   // Para hacer más dinámico el sistema, estas constantes son quienes definen
   // las claves en el arreglo $_GET que decidirán el trayecto del mismo.
-  const ROUTING_CONTROLLER_VARIABLE = 'a';
-  const ROUTING_METHOD_VARIABLE = 'f';
-  const ROUTING_VALUE_VARIABLE = 'v';
-  const ROUTING_PAGENUMBER_VARIABLE = 'p';
+  const KEY_CONTROLLER = 'a';
+  const KEY_METHOD = 'f';
+  const KEY_VALUE = 'v';
+  const KEY_PAGE = 'p';
 
 
 
@@ -94,32 +100,31 @@ final class Core
   private static function route()
    {
     // Controlador
-    if(isset($_GET[self::ROUTING_CONTROLLER_VARIABLE]))
+    if(isset($_GET[self::KEY_CONTROLLER]))
      {
-      self::$target_routing['controller'] = $_GET[self::ROUTING_CONTROLLER_VARIABLE];
+      self::$target_routing['controller'] = $_GET[self::KEY_CONTROLLER];
      } else { self::$target_routing['controller'] = self::$config['default_route']['controller']; }
 
     // Método
-    if(isset($_GET[self::ROUTING_METHOD_VARIABLE]))
+    if(isset($_GET[self::KEY_METHOD]))
      {
-      self::$target_routing['method'] = $_GET[self::ROUTING_METHOD_VARIABLE];
+      self::$target_routing['method'] = $_GET[self::KEY_METHOD];
      } else { self::$target_routing['method'] = self::$config['default_route']['method']; }
 
     // Índice
-    if(isset($_GET[self::ROUTING_VALUE_VARIABLE]))
+    if(isset($_GET[self::KEY_VALUE]))
      {
-      self::$target_routing['value'] = $_GET[self::ROUTING_VALUE_VARIABLE];
+      self::$target_routing['value'] = $_GET[self::KEY_VALUE];
      }
 
     // Página
-    if(isset($_GET[self::ROUTING_PAGENUMBER_VARIABLE]))
+    if(isset($_GET[self::KEY_PAGE]))
      {
-      self::$target_routing['page'] = (int) $_GET[self::ROUTING_PAGENUMBER_VARIABLE];
+      self::$target_routing['page'] = (int) $_GET[self::KEY_PAGE];
      }
-
     if(self::is_valid_route(self::$target_routing['controller'], self::$target_routing['method']) === false)
      {
-      self::$target_routing = self::$error_routes;
+      self::$target_routing = self::$config['error_route'];
      }
 
     self::call_controller();
@@ -139,7 +144,7 @@ final class Core
    * @param boolean $redirected Indica si la llamada es parte de una redirección
    * @return nothing
    */
-  private static function call_controller($controller = null, $method = null, $value = null, $page = 1, $redirected = false)
+  private static function call_controller($controller = null, $method = null, $value = null, $page = 1, $redirected = 0)
    {
     if($controller !== null)
      {
@@ -159,13 +164,13 @@ final class Core
      }
     else
      {
-      throw new Core_Exception('El controlador cargado ('.self::$target_routing['controller'].') es inv&aacute;lido.', self::$error);
+      self::handle_error(self::ERROR_INVALID_ROUTE, 'El controlador cargado ('.self::$target_routing['controller'].') es inv&aacute;lido.', self::$error);
      }
 
     // Esta porción de código sólo es llamada cuando un controlador pide, desde
-    // sí mismo, una redirección, lo cual reiniciará las vistas y el controlador
-    // que había sido cargado previamente
-    if(self::$new_routing['controller'] !== null && $redirected !== false)
+    // sí mismo, una redirección. Se reiniciarán las vistas y el controlador
+    // actual
+    if(self::$new_routing['controller'] !== null && $redirected > 0 && $redirected < self::$config['max_redirections'])
      {
       // Removemos el controlador anterior.
       unset($controller);
@@ -181,6 +186,10 @@ final class Core
 
       // Llamamos a esta misma función para continuar el proceso.
       self::call_controller(self::$target_routing['controller'], self::$target_routing['method'], self::$target_routing['value'], self::$target_routing['page'], true);
+     }
+    elseif($redirected === self::$config['max_redirections'])
+     {
+      self::handle_error(self::ERROR_LOOP);
      }
    } // private static function call_controller();
 
@@ -236,22 +245,43 @@ final class Core
 
     if(isset(self::$avaiable_controllers[$controller]) === false)
      {
-      throw new Core_Exception('El controlador '.$controller.' no se encuentra en la lista de rutas.');
+      self::handle_error('El controlador '.$controller.' no se encuentra en la lista de rutas.', self::ERROR_INVALID_ROUTE);
      }
-
-    if(isset(self::$avaiable_controllers[$controller][$method]) === false)
+    elseif(isset(self::$avaiable_controllers[$controller][$method]) === false)
      {
-      throw new Core_Exception('El m&eacute;todo indicado ('.$controller.'->'.$method.') no existe en la lista de rutas.');
+      self::handle_error('El m&eacute;todo indicado ('.$controller.'->'.$method.') no existe en la lista de rutas.', self::ERROR_INVALID_ROUTE);
      }
-
-    if(is_file(CONTROLLERS_DIR.'class.'.$controller.EXT) === false)
+    elseif(is_file(CONTROLLERS_DIR.'class.'.$controller.EXT) === false)
      {
-      throw new Core_Exception('El archivo de controlador '.$controller.' no existe.');
+      self::handle_error('El archivo de controlador '.$controller.' no existe.', self::ERROR_FILE);
      }
-
-    return true;
+    return (bool) (self::$error_code === null);
    } // private static function is_valid_route();
-} // final class Core();
+
+
+
+  /**
+   * Método para el manejo interno de errores.
+   * @param integer $error_code Código de error
+   * @param integer $force_close Forzar fin de ejecución
+   * @param string $message Mensaje opcional
+   * @return void
+   */
+  public static function handle_error($message = '', $error_code = self::ROUTING_ERROR_CONTEXT)
+   {
+    self::$error_code = $error_code;
+
+    if(DEVELOPER_MODE === true)
+     {
+      throw new Core_Exception($message);
+     }
+    else
+     {
+      echo $message;
+      // TODO: ERROR LOG
+     }
+   }
+ } // final class Core();
 
 
 /**

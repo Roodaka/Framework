@@ -17,11 +17,11 @@
  */
 function url($controller, $method = null, $value = null, $page = null, $title = null)
  {
-  return 'index.php?'.Framework\Core::ROUTING_CONTROLLER_VARIABLE.'='.$controller
-  .(($value !== null) ? '&'.Framework\Core::ROUTING_VALUE_VARIABLE.'='.$value : '')
+  return 'index.php?'.Framework\Core::KEY_CONTROLLER.'='.$controller
+  .(($value !== null) ? '&'.Framework\Core::KEY_VALUE.'='.$value : '')
   .(($title !== null) ? '-'.$title : '')
-  .(($method !== null) ? '&'.Framework\Core::ROUTING_METHOD_VARIABLE.'='.$method : '')
-  .(((int) $page >= 1) ? '&'.Framework\Core::ROUTING_PAGENUMBER_VARIABLE.'='.$page : '');
+  .(($method !== null) ? '&'.Framework\Core::KEY_METHOD.'='.$method : '')
+  .(((int) $page >= 1) ? '&'.Framework\Core::KEY_PAGE.'='.$page : '');
  } // function url();
 
 

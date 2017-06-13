@@ -173,7 +173,7 @@ final class View
 
       // Configuramos Rain para trabajar
       Utils\raintpl::configure('base_url', \Framework\Core::$url_fullpath);
-      Utils\raintpl::configure('tpl_dir', 'data'.DS.'html'.DS);
+      Utils\raintpl::configure('tpl_dir', 'views'.DS.'html'.DS);
       Utils\raintpl::configure('cache_dir', VIEWS_DIR.'cached'.DS.'templates'.DS);
 
       $rain->assign('lang', self::load_language(self::$configuration['lang']));
