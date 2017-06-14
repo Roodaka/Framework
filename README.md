@@ -1,4 +1,4 @@
-##Roodaka/Framework
+## Roodaka/Framework
 Una estructura MVC Minimizada que contiene las herramientas básicas necesarias para el Desarrollo Web 3.0.
 
 ## Motivación 
@@ -27,7 +27,7 @@ Muchos de los framework que he utilizado son pesados e incluso poseen una estruc
  * Extender librería Database para compatibilidad con otros DBM / Múltiples conexiones.
 
 ## Problemas conocidos & Reporte de bugs/Recomendaciones
-Por favor visitar el [issue tracker de este repositorio](https://github.com/Roodaka/Framework/issues) para conocer los problemas actuales del sistema.
+Por favor visitar el [issue tracker](https://github.com/Roodaka/Framework/issues) para conocer los problemas actuales del framework.
 
 ## Trabajando con el framework
 Visite la [Wiki](https://github.com/Roodaka/Framework/wiki) para más información.
