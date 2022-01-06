@@ -1,6 +1,11 @@
-TO-DO
+#TODO
+remover carga dinamica de cacheo, cargar por constantes. (class.cache.php)
+terminar storm
+limpiar configurations
+
+
+ROADMAP?
 =========
-Optimizar e Integrar clase de Paginado
 Implementar Template Manager.
 Implementar Uploader de archivos.
 Implementar Cache memcached

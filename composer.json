@@ -1,0 +1,15 @@
+{
+    "name": "roodaka/framework",
+    "description": "simple php framework",
+    "type": "project",
+    "license": "apache",
+    "authors": [
+        {
+            "name": "Cody Roodaka",
+            "email": "Roodaka@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "latte/latte": "^2.10"
+    }
+}

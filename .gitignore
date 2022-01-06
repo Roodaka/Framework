@@ -1,6 +1,5 @@
-/views/cached/data/*
-/views/cached/templates/*
-/configurations/database.php
-/configurations/session.php
+/application/cached/data/*
+/application/cached/templates/*
 /robots.txt
-/framework.komodoproject
+/vendor/
+config.php

@@ -14,8 +14,7 @@ Muchos de los framework que he utilizado son pesados e incluso poseen una estruc
  * Generador de Hash para contraseñas.
  * Autocarga de configuraciones desde la base de datos
  * Librería de Cache ([APC](http://php.net/apc) y basada en archivos).
-
-## Objetivos para el desarrollo futuro
+ ## Objetivos para el desarrollo futuro
  * Cacheo profundo de vistas y datos, coordinados con la ruta.
  * Gestor de plantillas propio.
  * Librerías oAuth, IPN (PayPal).
@@ -23,8 +22,6 @@ Muchos de los framework que he utilizado son pesados e incluso poseen una estruc
  * Seguridad en formularios (CSRF).
  * Mejorar el manejo de excepciones y errores.
  * Extender la librería de Cache para compatibilidad con [Memcached](http://php.net/manual/en/book.memcached.php).
- * Integración de Composer.
- * Extender librería Database para compatibilidad con otros DBM / Múltiples conexiones.
 
 ## Problemas conocidos & Reporte de bugs/Recomendaciones
 Por favor visitar el [issue tracker](https://github.com/Roodaka/Framework/issues) para conocer los problemas actuales del framework.
@@ -37,8 +34,8 @@ Visite la [Wiki](https://github.com/Roodaka/Framework/wiki) para más informaci�
  * Webserver, Apache o nginx
 
 ## Software de terceros
- * [RainTPL](https://github.com/feulf/raintpl) de Federico Ulfo.
- * [SecureHash](http://blackbe.lt/secure-php-authentication-bcrypt/) de Corey Ballou.
+ * [Latte](https://latte.nette.org/) = Nette
+ * [SecureHash](http://blackbe.lt/secure-php-authentication-bcrypt/) - Corey Ballou.
 
 ## Licencia Apache v2.0
 Unless otherwise noted, LEAP is licensed under the Apache License, Version 2.0 (the "License"); you may not use these files except in
@@ -50,4 +47,4 @@ Unless required by applicable law or agreed to in writing, software distributed 
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
 and limitations under the License.
 
-Copyright © 2014–2017 [Cody Roodaka](http://twitter.com/roodaka)
+Copyright © 2014–2022 [Cody Roodaka](http://twitter.com/roodaka)
