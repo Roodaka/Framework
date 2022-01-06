@@ -29,23 +29,25 @@ class Cache
      */
     public static function init($return = false, $force_type = null)
     {
-        // Cargamos la abstracción que modela los handlers.
-        require_once(SYSTEM_PATH . 'cache_handlers/class.base.php');
+        if (CACHE_CONFIG['handler'] !== 'none' && $force_type !== null) {
+            // Cargamos la abstracción que modela los handlers.
+            require_once(SYSTEM_PATH . 'cache_handlers/class.base.php');
 
-        $handler = ($force_type !== null) ? $force_type : CACHE_CONFIG['handler'];
+            $handler = ($force_type !== null) ? $force_type : CACHE_CONFIG['handler'];
 
-        if (is_file(SYSTEM_PATH . 'cache_handlers/class.' . $handler . '.php')) {
-            require(SYSTEM_PATH . 'cache_handlers/class.' . $handler . '.php');
-            $name = '\Framework\Cache\\' . $handler;
-            $temp = new $name();
-            if ($return === false) {
-                self::$handler = $temp;
-                unset($temp);
+            if (is_file(SYSTEM_PATH . 'cache_handlers/class.' . $handler . '.php')) {
+                require(SYSTEM_PATH . 'cache_handlers/class.' . $handler . '.php');
+                $name = '\Framework\Cache\\' . $handler;
+                $temp = new $name();
+                if ($return === false) {
+                    self::$handler = $temp;
+                    unset($temp);
+                } else {
+                    return $temp;
+                }
             } else {
-                return $temp;
+                return false;
             }
-        } else {
-            return false;
         }
     }
 
