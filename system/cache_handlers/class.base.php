@@ -10,10 +10,9 @@ abstract class Base
     /**
      * Otener una variable cacheada (si existe)
      * @param string $name Nombre de la variable.
-     * @param boolean $return Retornar los datos almacenados u obtener un booleano validando su existencia
      * @return array|boolean
      */
-    abstract public function get($name, $return = true);
+    abstract public function get(string $name): mixed;
     /**
      * Cachear nuevos datos.
      * @param string $name Nombre de la variable
@@ -21,16 +20,16 @@ abstract class Base
      * @param integer $expires Vida de este cache
      * @return boolean Resultado de la operación.
      */
-    abstract public function set($name, $data, $lifetime);
+    abstract public function set(string $name, mixed $data, int $lifetime): bool;
     /**
      * Obtener el tamaño total del cache actual
      * @return integer Tamaño en Bytes
      */
-    abstract public function size();
+    abstract public function size(): int;
     /**
      * Solicitar limpieza del Cache.
      * @param string $name Opcional, limitar el borrado a una variable.
      * @return boolean
      */
-    abstract public function clear($name = '');
+    abstract public function clear(string $name): bool;
 }

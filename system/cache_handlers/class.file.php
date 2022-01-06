@@ -12,27 +12,30 @@ namespace Framework\Cache;
 
 class File extends Base
 {
+    private static string $path;
     /**
      * Constructor de la clase.
      * @return void
      */
     public function __construct()
     {
-        if (is_writable(CACHE_CONFIG['path']) !== true) {
+        if (is_writable(APP_PATH . 'cached/data') !== true) {
+            self::$path = APP_PATH . 'cached/data';
+        } else {
             throw new \Framework\Cache_Exception('El cache basado en archivos no pudo inicializarse por problemas de escritura.');
         }
     }
 
-    public function get($name, $return = true)
+    public function get(string $name): mixed
     {
         // Incluimos y retornamos el archivo
-        if (is_file(CACHE_CONFIG['path'] . $name . '.php')) {
-            $data = unserialize(require(CACHE_CONFIG['path'] . $name . '.php'));
+        if (is_file(self::$path . $name . '.php')) {
+            $data = unserialize(require(self::$path . $name . '.php'));
             // Si todavía le queda 'vida' lo cargamos
             if ($data['time'] > (time() - $data['lifetime'])) {
                 return $return === true ? $data['data'] : true;
             } else {
-                unlink(CACHE_CONFIG['path'] . $name . '.php');
+                unlink(self::$path . $name . '.php');
                 return false;
             }
         } else {
@@ -40,10 +43,10 @@ class File extends Base
         }
     }
 
-    public function set($name, $data, $lifetime)
+    public function set(string $name, mixed $data, int $lifetime): bool
     {
         // Ubicación del archivo
-        $target = CACHE_CONFIG['path'] . $name . '.php';
+        $target = self::$path . $name . '.php';
 
         $cache = array(
             'data' => $data,
@@ -56,7 +59,7 @@ class File extends Base
 
         if (!$file) {
             throw new \Framework\Cache_Exception('No se pudo trabajar con el archivo "' . $target . '"');
-        } elseif (!fwrite($file, '<?php defined(\'SYSTEM_PATH\') or exit(\'No tienes Permitido el acceso.\'); return \'' . serialize($cache) . '\';')) {
+        } elseif (!fwrite($file, '<?php return \'' . serialize($cache) . '\';')) {
             throw new \Framework\Cache_Exception('No se pudo escribir el archivo "' . $target . '"');
         } else {
             fclose($file);
@@ -64,16 +67,16 @@ class File extends Base
         }
     }
 
-    public function size()
+    public function size(): int
     {
         $size = 0;
-        $dir = opendir(CACHE_CONFIG['path']);
+        $dir = opendir(self::$path);
         if (!$dir) {
-            throw new \Framework\Cache_Exception('No se pudo abrir el directorio ' . CACHE_CONFIG['path'] . '.');
+            throw new \Framework\Cache_Exception('No se pudo abrir el directorio ' . self::$path . '.');
         } else {
             while (($file = readdir($dir)) !== false) {
                 if ($file !== '.' and $file !== '..') {
-                    $size += filesize(CACHE_CONFIG['path'] . $file);
+                    $size += filesize(self::$path . $file);
                 }
             }
             closedir($dir);
@@ -82,18 +85,18 @@ class File extends Base
         return 0;
     }
 
-    public function clear($name = '')
+    public function clear(string $name): bool
     {
         if (!empty($name)) {
-            return unlink(CACHE_CONFIG['path'] . $name . '.php');
+            return unlink(self::$path . $name . '.php');
         }
-        $dir = opendir(CACHE_CONFIG['path']);
+        $dir = opendir(self::$path);
         if (!$dir) {
-            throw new \Framework\Cache_Exception('No se pudo abrir el directorio ' . CACHE_CONFIG['path'] . '.');
+            throw new \Framework\Cache_Exception('No se pudo abrir el directorio ' . self::$path . '.');
         } else {
             while (($file = readdir($dir)) !== false) {
                 if ($file !== '.' || $file !== '..') {
-                    unlink(CACHE_CONFIG['path'] . $file);
+                    unlink(self::$path . $file);
                 }
             }
             closedir($dir);

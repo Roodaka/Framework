@@ -1,60 +1,27 @@
 <?php
 
-/**
- * Implementación de cacheo de datos.
- * Ésta clase actuará de interfaz para así poder utilizar los distintos tipos de Cache
- * sin necesidad de modificar líneas de código.
- * @package class.cache.php
- * @author Cody Roodaka <roodakazo@gmail.com>
- * @version  $Revision: 0.0.1
- * @access public
- */
-
 namespace Framework;
 
 class Cache
 {
-    /**
-     * Handler de cacheo en uso.
-     * @var object
-     */
     private static $handler = null;
-    /**
-     * Duración por defecto del cache.
-     * @var integer
-     */
     private static $lifetime = 900; // 15 mins
-    /**
-     * Inicializador de la clase.
-     */
-    public static function init($handler = 'none', $return = false)
+
+    public static function init()
     {
-        if ($handler !== 'none') {
-            // Cargamos la abstracción que modela los handlers.
+        if ($_ENV['PHP_ENV'] === 'development') {
             require_once(SYSTEM_PATH . 'cache_handlers/class.base.php');
 
-            if (is_file(SYSTEM_PATH . 'cache_handlers/class.' . $handler . '.php')) {
-                require(SYSTEM_PATH . 'cache_handlers/class.' . $handler . '.php');
-                $name = '\Framework\Cache\\' . $handler;
-                $temp = new $name();
-                if ($return === false) {
-                    self::$handler = $temp;
-                    unset($temp);
-                } else {
-                    return $temp;
-                }
+            if (extension_loaded('apcu') === true or (bool) ini_get('apcu.enabled') === true) {
+                require_once(SYSTEM_PATH . 'cache_handlers/class.apcu.php');
+                self::$handler = new \Framework\Cache\APCU();
             } else {
-                return false;
+                require_once(SYSTEM_PATH . 'cache_handlers/class.file.php');
+                self::$handler = new \Framework\Cache\File;
             }
         }
     }
 
-
-
-    /**
-     * 
-     * @return boolean
-     */
     public static function set($name, $data, $lifetime = null)
     {
         if (self::$handler !== null) {
@@ -63,12 +30,6 @@ class Cache
         return false;
     }
 
-
-
-    /**
-     *
-     * @return
-     */
     public static function get($name)
     {
         if (self::$handler !== null) {
@@ -77,12 +38,6 @@ class Cache
         return false;
     }
 
-
-
-    /**
-     * Solicitar el tamaño del cache actual.
-     * @return integer
-     */
     public static function size()
     {
         if (self::$handler !== null) {
@@ -91,14 +46,7 @@ class Cache
         return 0;
     }
 
-
-
-    /**
-     * Borrar una variable cacheada, de no argumentar ninguna, se borrará todo el cache.
-     * @param string $name Nombre de la variable cacheada a borrar.
-     * @return boolean
-     */
-    public static function clear($name = '')
+    public static function clear()
     {
         if (self::$handler !== null) {
             return (int) self::$handler->clear();
