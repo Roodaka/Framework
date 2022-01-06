@@ -17,11 +17,12 @@ require(SYSTEM_PATH . 'functions/core.php');
  */
 set_exception_handler('exception_handler');
 
-require_once(SYSTEM_PATH . 'libraries/class.database.php');
+
 require_once(SYSTEM_PATH . 'libraries/class.cache.php');
 require_once(SYSTEM_PATH . 'libraries/class.controller.php');
-require_once(SYSTEM_PATH . 'libraries/class.factory.php');
 require_once(SYSTEM_PATH . 'libraries/class.model.php');
+require_once(SYSTEM_PATH . 'libraries/class.factory.php');
+require_once(SYSTEM_PATH . 'libraries/class.database.php');
 require_once(SYSTEM_PATH . 'libraries/class.session.php');
 require_once(SYSTEM_PATH . 'libraries/class.view.php');
 require_once(SYSTEM_PATH . 'libraries/class.core.php');

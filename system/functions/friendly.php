@@ -1,4 +1,5 @@
 <?php
+
 /**
  * libraries/functions.friendly.php
  * Cody Roodaka 2011
@@ -12,6 +13,6 @@
  * @author Cody Roodaka <roodakazo@gmail.com>
  */
 function resizetext($text, $max = 100)
- {
-  return (isset($text{$max})) ? substr($text, 0, $max).'&hellip;' : $text;
- } // function resizetext();
+{
+    return (isset($text[$max])) ? substr($text, 0, $max) . '&hellip;' : $text;
+} // function resizetext();

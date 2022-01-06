@@ -27,13 +27,11 @@ class Cache
     /**
      * Inicializador de la clase.
      */
-    public static function init($return = false, $force_type = null)
+    public static function init($handler = 'none', $return = false)
     {
-        if (CACHE_CONFIG['handler'] !== 'none' && $force_type !== null) {
+        if ($handler !== 'none') {
             // Cargamos la abstracción que modela los handlers.
             require_once(SYSTEM_PATH . 'cache_handlers/class.base.php');
-
-            $handler = ($force_type !== null) ? $force_type : CACHE_CONFIG['handler'];
 
             if (is_file(SYSTEM_PATH . 'cache_handlers/class.' . $handler . '.php')) {
                 require(SYSTEM_PATH . 'cache_handlers/class.' . $handler . '.php');
