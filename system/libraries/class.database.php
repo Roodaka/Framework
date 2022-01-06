@@ -1,15 +1,5 @@
 <?php
 
-/**
- * Clase de Abstracción de bases de datos sencilla y de fácil implementación
- * @package class.littledb.php
- * @author Cody Roodaka <roodakazo@hotmail.com>
- * @author Ignacio Daniel Rostagno <ignaciorostagno@vijona.com.ar>
- * @version  $Revision: 0.2.9
- * @access public
- * @see https://github.com/roodaka/littledb
- */
-
 namespace Framework;
 
 use mysqli;
@@ -20,7 +10,7 @@ class Database
      * Recurso MySQL
      * @var resource
      */
-    private static mysqli $conn;
+    private static object $conn;
 
     /**
      * Cantidad de consultas realizadas
@@ -46,17 +36,19 @@ class Database
 
     /**
      * Inicializador de la clase
-     * @param string $host Url o DNS del Servidor MySQL
-     * @param string $user Usuario del servidor
-     * @param string &pass Contraseña del servidor
-     * @param string $db Nombre de la base de datos
-     * @param mixed $logger Función para el registro de datos
-     * @param mixed $errors Función para el manejo de errores
      * @return nothing
      */
-    public static function init()
+    public static function init(): void
     {
-        self::$conn = mysqli_connect(DATABASE_CONFIG['host'], DATABASE_CONFIG['user'], DATABASE_CONFIG['pass'], DATABASE_CONFIG['name']) or self::error('', 'No se pudo conectar al servidor MySQL');
+        if (isset($_ENV['DB_DRIVER']) === true && $_ENV['DB_DRIVER'] !== 'none') {
+            self::$conn = mysqli_connect(
+                $_ENV['DB_HOST'],
+                $_ENV['DB_USER'],
+                $_ENV['DB_PASS'],
+                $_ENV['DB_NAME']) or self::error('', 'No se pudo conectar al servidor MySQL');
+        } else {
+            self::$conn = null;
+        }
     }
 
 
