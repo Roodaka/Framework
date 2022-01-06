@@ -10,6 +10,7 @@
         }
     ],
     "require": {
-        "latte/latte": "^2.10"
+        "latte/latte": "^2.10",
+        "vlucas/phpdotenv": "^5.4"
     }
 }

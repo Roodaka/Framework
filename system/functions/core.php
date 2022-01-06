@@ -76,7 +76,7 @@ function exception_handler($exception)
         $last_line = isset($trace['line']) ? $trace['line'] : $last_line;
         echo '<span>' . str_replace(ROOT_PATH, 'HOME_DIR/', $last_file)
             . ((isset($trace['class']) && isset($trace['type'])) ? $trace['class'] . $trace['type'] : '') . $trace['function']
-            . '(' . ((DEVELOPER_MODE === true) ? '<i>' . json_encode($trace['args']) . '</i>' : '') . ')</span> on <strong>line ' . $last_line . '</strong><br />';
+            . '(' . (($_ENV['PHP_ENV'] === 'development') ? '<i>' . json_encode($trace['args']) . '</i>' : '') . ')</span> on <strong>line ' . $last_line . '</strong><br />';
     }
     echo '</p></div>';
 }

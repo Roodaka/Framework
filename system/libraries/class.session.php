@@ -29,7 +29,7 @@ final class Session
      * Iniciamos la sesión
      * @return nothing
      */
-    public static function init()
+    public static function init(): void
     {
         if (!isset($_SESSION) or session_id() == '') {
             session_start();
@@ -37,8 +37,8 @@ final class Session
 
         $_SESSION['datetime'] = time();
 
-        if (SESSION_CONFIG['use_cookies'] === true && isset($_COOKIE[PROJECT_NAME])) {
-            self::$hash = $_COOKIE[PROJECT_NAME];
+        if (isset($_COOKIE[$_ENV['PROJECT_NAME']])) {
+            self::$hash = $_COOKIE[$_ENV['PROJECT_NAME']];
         }
 
         if (isset($_SESSION['hash'])) {
@@ -61,9 +61,7 @@ final class Session
             }
         }
         */
-    } // public static function init();
-
-
+    }
 
     /**
      * Asignar un ID a la sesión.
@@ -71,14 +69,13 @@ final class Session
      * @param boolean $cookies Indica el uso de cookies
      * @return boolean
      */
-    public static function set_id(string $id)
+    public static function set_id(string $id): void
     {
         $_SESSION['hash'] = hash('sha256', $id);
         self::$hash = $_SESSION['hash'];
 
-        if (SESSION_CONFIG['use_cookies'] === true) {
-            setcookie(PROJECT_NAME, self::$hash, (time() + SESSION_CONFIG['duration']), '/', $_SERVER['SERVER_NAME']);
-        }
+        setcookie($_ENV['PROJECT_NAME'], self::$hash, (time() + $_ENV['SESSION_DURATION']), '/', $_SERVER['SERVER_NAME']);
+
 
         // FIXME: strategy
         /*
@@ -93,16 +90,13 @@ final class Session
             throw new Session_Exception('No se ha configurado la sesi&oacute;n. revise el archivo configurations/session.php');
         }
         */
-    } // public static function set_id();
-
-
-
+    }
 
     /**
      * Seteamos el modelo de usuario
      * @return nothing
      */
-    private static function set_user_object($id)
+    private static function set_user_object($id): void
     {
         // FIXME: strategy
         /*
@@ -113,44 +107,38 @@ final class Session
             throw new Session_Exception('No se ha asignado un modelo para el Usuario en Sesi&oacute;n.');
         }
         */
-    } // private static function set_user_object();
-
-
+    }
 
     /**
      * Chequeamos si la sesión es de un usuario válido
      * @return bool
      */
-    public static function is_session()
+    public static function is_session(): bool
     {
         return !empty(self::$user);
-    } // private static function is_user_id()
-
-
+    }
 
     /**
      * Generar un token para CSRF.
      * @param string $form Nombre del formulario.
      * @return string Token para el formulario solicitado
      */
-    public static function generate_token($form)
+    public static function generate_token($form): string
     {
         $tohash = ((self::$user !== null) ? self::$user->id : '') . time() . $form;
         $tohash = hash('sha256', $tohash);
-        $_SESSION[PROJECT_NAME . '_' . $form] = $tohash;
+        $_SESSION[$_ENV['PROJECT_NAME'] . '_' . $form] = $tohash;
 
         return $tohash;
     }
-
-
 
     /**
      * Validar un token
      * @return boolean Resultado
      */
-    public static function validate_token($form, $token)
+    public static function validate_token($form, $token): bool
     {
-        $name = PROJECT_NAME . '_' . $form;
+        $name = $_ENV['PROJECT_NAME'] . '_' . $form;
         echo '_validate';
         if (isset($_SESSION[$name])) {
             echo '_isset';
@@ -162,34 +150,25 @@ final class Session
         return false;
     }
 
-
-
     /**
      * Terminamos la sesión.
      * @return Nothing
      */
-    public static function end()
+    public static function end(): void
     {
         self::$user = null;
 
         // FIXME: strategy
         // \Framework\Database::delete(self::$configuration['mysql']['table'], array(self::$configuration['mysql']['field_hash'] => $_SESSION['hash']), false);
 
-        if (SESSION_CONFIG['use_cookies'] === true && isset($_COOKIE[PROJECT_NAME])) {
-            setcookie(PROJECT_NAME, '', (time() - SESSION_CONFIG['duration']), '/', $_SERVER['SERVER_NAME']);
+        if (isset($_COOKIE[$_ENV['PROJECT_NAME']])) {
+            setcookie($_ENV['PROJECT_NAME'], '', (time() - $_ENV['SESSION_DURATION']), '/', $_SERVER['SERVER_NAME']);
             unset($_COOKIE);
         }
 
         unset($_SESSION);
         session_regenerate_id(true);
-    } // public static function end();
-} // final class Session();
+    }
+} 
 
-
-/**
- * Excepción exclusiva del componente Session
- * @access private
- */
-class Session_Exception extends \Exception
-{
-} // class Session_Exception();
+class Session_Exception extends \Exception { }

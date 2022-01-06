@@ -154,7 +154,7 @@ final class View
             });
 
             $latte->setTempDirectory(APP_PATH . 'cached/templates/');
-            $latte->setAutoRefresh(DEVELOPER_MODE);
+            $latte->setAutoRefresh($_ENV['PHP_ENV'] === 'development');
             //$rain->assign('lang', self::load_language(self::$lang));
 
             if (is_file(APP_PATH . 'views/templates/framework_footer.html') === true) {

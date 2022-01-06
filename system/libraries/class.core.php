@@ -174,7 +174,7 @@ final class Core
 
             // Llamamos a esta misma función para continuar el proceso.
             self::call_controller(self::$target_routing['controller'], self::$target_routing['method'], self::$target_routing['value'], self::$target_routing['page'], true);
-        } elseif ($redirected === MAX_REDIRECTIONS) {
+        } elseif ($redirected === $_ENV['MAX_REDIRECTIONS']) {
             self::handle_error(self::ERROR_LOOP);
         }
     } // private static function call_controller();
@@ -246,7 +246,7 @@ final class Core
     {
         self::$error_code = $error_code;
 
-        if (DEVELOPER_MODE === true) {
+        if ($_ENV['PHP_ENV'] === 'development') {
             throw new Core_Exception($message);
         } else {
             echo $message;

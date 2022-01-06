@@ -2,4 +2,4 @@
 /application/cached/templates/*
 /robots.txt
 /vendor/
-config.php
+.env
