@@ -32,4 +32,5 @@ require_once ROOT_PATH . 'vendor/autoload.php';
 \Framework\Database::init();
 \Framework\Cache::init();
 \Framework\Session::init();
+\Framework\View::init();
 \Framework\Core::init();

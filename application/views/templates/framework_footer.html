@@ -1,11 +1,4 @@
-  <div class='footer'>
-   {if="DEVELOPER_MODE === true"}
-    <span><b>{$lang.dev_time}</b>: {function="round(microtime(true) - SYSTEM_INIT_TIME, 2)"}</span>
-    <span><b>{$lang.dev_ram}</b>: {function="round((memory_get_usage() - SYSTEM_INIT_RAM) / 1024, 2)"}kb</span>
-    <span><b>{$lang.dev_sql}</b>: {function="Framework\Database::$count"}</span>
-    <span><b>{$lang.dev_cache}</b>: {function="round(Framework\Cache::size() / 1024, 2)"}kb <small><a href='{function="url('home', 'clear')"}'>{$lang.dev_cache_clear}</a></small></span>
-   {/if}
-  </div>
-  <script src='views/html/js/base.js'></script>
- </body>
+        <div class='footer'>
+        </div>
+    </body>
 </html>

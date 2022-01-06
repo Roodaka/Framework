@@ -38,6 +38,12 @@ final class View
     protected static $lang;
 
 
+    public static function init() {
+        if (is_file(APP_PATH . 'views/templates/framework_header.html') === true) {
+            self::$templates[] = 'framework_header';
+        }
+    }
+
     /**
      * Agregar una clave con su respectivo valor al arreglo de claves
      * @param string $key Clave a asignar
@@ -138,10 +144,6 @@ final class View
     public static function show()
     {
         if (count(self::$templates) >= 1) {
-            if (is_file(APP_PATH . 'views/html/framework_header') === true) {
-                self::$templates[] = 'framework_header';
-            }
-
             self::add_key('system', require_once(APP_PATH . 'configurations/global.php'));
             self::add_key('core_files', self::$files);
 
@@ -153,18 +155,9 @@ final class View
 
             $latte->setTempDirectory(APP_PATH . 'cached/templates/');
             $latte->setAutoRefresh(DEVELOPER_MODE);
+            //$rain->assign('lang', self::load_language(self::$lang));
 
-            /*
-            // Configuramos Rain para trabajar
-            Utils\raintpl::configure('base_url', \Framework\Core::$url_fullpath);
-            Utils\raintpl::configure('tpl_dir', 'views/html/');
-            Utils\raintpl::configure('cache_dir', APP_PATH . 'cached/templates/');
-
-            // 
-            $rain->assign('lang', self::load_language(self::$lang));
-            $rain->assign(self::$variables);
-            */
-            if (is_file(APP_PATH . 'views/html/framework_footer') === true) {
+            if (is_file(APP_PATH . 'views/templates/framework_footer.html') === true) {
                 self::$templates[] = 'framework_footer';
             }
 
