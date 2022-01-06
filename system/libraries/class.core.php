@@ -159,7 +159,7 @@ final class Core
         // Esta porción de código sólo es llamada cuando un controlador pide, desde
         // sí mismo, una redirección. Se reiniciarán las vistas y el controlador
         // actual
-        if (self::$new_routing['controller'] !== null && $redirected > 0 && $redirected < MAX_REDIRECTIONS) {
+        if (self::$new_routing['controller'] !== null && $redirected > 0 && $redirected < $_ENV['MAX_REDIRECTIONS']) {
             // Removemos el controlador anterior.
             unset($controller);
 
@@ -177,7 +177,7 @@ final class Core
         } elseif ($redirected === $_ENV['MAX_REDIRECTIONS']) {
             self::handle_error(self::ERROR_LOOP);
         }
-    } // private static function call_controller();
+    }
 
 
 
