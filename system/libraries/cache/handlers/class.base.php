@@ -2,9 +2,6 @@
 
 namespace Framework\Cache;
 
-/**
- * Clase abstracta para estructurar los handlers del Cache.
- */
 abstract class Base
 {
     /**

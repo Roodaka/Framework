@@ -26,7 +26,7 @@ class Home Extends \Framework\Controller
     \Framework\View::add_key('users', $users);
 
     \Framework\View::add_template('home');
-    //return Framework\Core::redirect('Other');
+    //return Framework\Router::redirect('Other');
    }
 
 
@@ -42,7 +42,7 @@ class Home Extends \Framework\Controller
        {
         $user->name = $this->post['name'];
         $user->lastname = $this->post['lastname'];
-        return \Framework\Core::redirect('home', 'main');
+        return \Framework\Router::redirect('home', 'main');
        }
       else
        {
@@ -52,7 +52,7 @@ class Home Extends \Framework\Controller
      }
     else
      {
-      return \Framework\Core::redirect('home', 'main');
+      return \Framework\Router::redirect('home', 'main');
      }
    }
 
@@ -73,7 +73,7 @@ class Home Extends \Framework\Controller
         if($new_user->save() === true)
          {
           \Framework\Cache::clear('main_users');
-          \Framework\Core::redirect('home', 'main');
+          \Framework\Router::redirect('home', 'main');
          }
        }
      }
@@ -94,7 +94,7 @@ class Home Extends \Framework\Controller
       $user = load_model('Example', (int) $id, null, true);
       $user->set_to_delete();
      }
-    return \Framework\Core::redirect('home', 'main');
+    return \Framework\Router::redirect('home', 'main');
    }
 
 
@@ -102,6 +102,6 @@ class Home Extends \Framework\Controller
   public function clear()
    {
     \Framework\Cache::clear();
-    return \Framework\Core::redirect('home', 'main');
+    return \Framework\Router::redirect('home', 'main');
    }
  } // class Home Extends Controller

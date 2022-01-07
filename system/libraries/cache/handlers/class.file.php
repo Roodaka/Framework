@@ -1,22 +1,11 @@
 <?php
 
-/**
- * Implementación del tipo de cacheo por archivos
- * @package class.file.php
- * @author Cody Roodaka <roodakazo@gmail.com>
- * @version  $Revision: 0.0.1
- * @access public
- */
-
 namespace Framework\Cache;
 
 class File extends Base
 {
     private static string $path;
-    /**
-     * Constructor de la clase.
-     * @return void
-     */
+
     public function __construct()
     {
         if (is_writable(APP_PATH . 'cached/data') !== true) {
@@ -28,10 +17,8 @@ class File extends Base
 
     public function get(string $name): mixed
     {
-        // Incluimos y retornamos el archivo
         if (is_file(self::$path . $name . '.php')) {
             $data = unserialize(require(self::$path . $name . '.php'));
-            // Si todavía le queda 'vida' lo cargamos
             if ($data['time'] > (time() - $data['lifetime'])) {
                 return $return === true ? $data['data'] : true;
             } else {
@@ -45,7 +32,6 @@ class File extends Base
 
     public function set(string $name, mixed $data, int $lifetime): bool
     {
-        // Ubicación del archivo
         $target = self::$path . $name . '.php';
 
         $cache = array(
@@ -54,7 +40,6 @@ class File extends Base
             'time' => time()
         );
 
-        // Abrimos el archivo
         $file = fopen($target, 'w');
 
         if (!$file) {

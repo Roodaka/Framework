@@ -67,7 +67,7 @@ abstract class Model
      * @param boolean $autoload Auto cargar los datos de objetivo o no
      * @return void
      */
-    public function __construct($id = null, $specified_fields = null, $autoload = true)
+    public function __construct(int $id = null, array $specified_fields = [], bool $autoload = true)
     {
         $this->specified_fields = $specified_fields;
         $this->id = $id;
@@ -75,9 +75,7 @@ abstract class Model
         if ($this->id !== null && $autoload === true) {
             return $this->load_data();
         }
-    } // public function __construct();
-
-
+    }
 
     /**
      * El destructor de la clase. éste se encarga de ejecutar las actualizaciones
@@ -109,16 +107,14 @@ abstract class Model
                 return true;
             }
         }
-    } // public function __destruct();
-
-
+    }
 
     /**
      * Obtenemos una clave privada de nuestro objeto
      * @param string $field Clave interna
      * @return mixed Valor asosiado la clave otorgada.
      */
-    final public function __get($field)
+    final public function __get(string $field): mixed
     {
         if (in_array($field, $this->fields)) {
             return $this->data[$field];
@@ -128,9 +124,7 @@ abstract class Model
         } else {
             throw new Model_Exception('El campo "' . $field . '" no se encuentra entre los campos predefinidos');
         }
-    } // final public function __get();
-
-
+    }
 
     /**
      * No permitimos actualizar una clave interna
@@ -138,48 +132,41 @@ abstract class Model
      * @param mixed $value Nuevo valor
      * @return boolean
      */
-    final public function __set($key, $value)
+    final public function __set($key, $value): void
     {
-        return $this->set_field($key, $value);
-    } // final public function __set();
-
-
+        $this->set_field($key, $value);
+    }
 
     /**
      * Chequeamos la existencia de una clave interna
      * @param string $key Clave interna
      * @return boolean
      */
-    final public function __isset($key)
+    final public function __isset($key): bool
     {
         return isset($this->data[$key]);
-    } // final public function __isset();
-
-
+    }
 
     /**
      * Si por alguna razón alguien necesita esta clase como un texto, retornamos
      * texto.
      * @return string
      */
-    final public function __toString()
+    final public function __toString(): string
     {
         return '<b>' . str_replace('Framework\Models\\', '', get_called_class()) . '[' . $this->id . ']</b>: ' . json_encode($this->data) . '<br />';
-    } // final protected function __toString();
+    }
 
-
-
-    final public function is_empty()
+    final public function is_empty(): bool
     {
         return empty($this->data);
     }
-
 
     /**
      * Cargamos los datos desde la base de datos
      * @return boolean
      */
-    protected function load_data()
+    protected function load_data(): bool
     {
         $temp = \Framework\Database::select($this->table, (($this->specified_fields === null) ? $this->fields : array_intersect($this->specified_fields, $this->fields)), array($this->primary_key => $this->id));
         if ($temp !== false) {
@@ -191,31 +178,25 @@ abstract class Model
         }
     }
 
-
-
     /**
      * Obtenemos los datos del modelo como un arreglo bidimensional
      * @return array
      */
-    public function get_array()
+    public function get_array(): array
     {
         return array_merge(array($this->primary_key => $this->id), $this->data);
-    } // public function get_array();
-
-
+    }
 
     /**
      * Seteamos el ID del objeto
      * @param integer $id ID del objeto.
      * @return boolean
      */
-    final public function set_id($id)
+    final public function set_id(int $id): void
     {
         $this->id = $id;
         $this->load_data();
-    } // final protected function set_id();
-
-
+    }
 
     /**
      * Seteamos el ID cargando los datos desde una columna ajena al $primary_key
@@ -223,35 +204,32 @@ abstract class Model
      * @param mixed $value Valor a consultar
      * @return boolean
      */
-    final public function set_id_by_key($key, $value)
+    final public function set_id_by_key(string $key, mixed $value): bool
     {
         $temp = \Framework\Database::select($this->table, $this->primary_key, array($key => $value));
         if ($temp !== false) {
             $temp = $temp->fetch();
             return $this->set_id($temp[$this->primary_key]);
         }
+        return false;
     }
-
-
 
     /**
      * Ordenamos que el modelo borre los datos asociados
      * @return nothing
      */
-    final public function set_to_delete()
+    final public function set_to_delete(): void
     {
         $this->state_deleted = true;
     }
-
-
 
     /**
      * Definimos (o redefinimos) el valor de un campo.
      * @param string|array $field Campo objetivo o arreglo de campos y valores
      * @param mixed $value Valor a asignar
-     * @return boolean
+     * @return void
      */
-    final protected function set_field($field, $value = null)
+    final protected function set_field(mixed $field, mixed $value = null): void
     {
         if (!is_array($field)) {
             if (!in_array($field, $this->fields)) {
@@ -270,31 +248,26 @@ abstract class Model
                 }
             }
         }
-    } // final protected function set_field();
-
-
+    }
 
     /**
      * Obtenemos la cantidad filas del modelo
      * @return int Número de filas
      */
-    final public function count($condition = null)
+    final public function count($condition = null): int
     {
         $query = \Framework\Database::select($this->table, 'COUNT(DISTINCT(' . $this->primary_key . ')) AS total', $condition);
         if ($query !== false) {
-            return $query->fetch('total');
+            return (int) $query->fetch('total');
         }
         return 0;
     }
-
-
-
 
     /**
      * Guardamos los datos del modelo
      * @return boolean
      */
-    final public function save()
+    final public function save(): bool
     {
         $id = \Framework\Database::insert($this->table, $this->data);
         if (is_int($id) === true) {
@@ -306,21 +279,17 @@ abstract class Model
         }
     } // final public function save();
 
-
-
     /**
      * Requerimos que cada modelo se pueda borrar a sí mismo
      */
-    protected function delete()
+    protected function delete(): bool
     {
         return \Framework\Database::delete($this->table, array($this->primary_key => $this->id));
     }
-} // class Model();
+}
 
 /**
  * Excepción única perteneciente a la clase Model
  * @access private
  */
-class Model_Exception extends \Exception
-{
-}
+class Model_Exception extends \Exception { }

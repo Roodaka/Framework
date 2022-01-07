@@ -12,40 +12,40 @@ namespace Framework;
 
 abstract class Controller
 {
-    /*
-   * Variable aún sin utilizar
-   * @var boolean
-   */
+    /**
+     * Variable aún sin utilizar
+     * @var boolean
+     */
     protected $permisson_required = null;
-    /*
-   * Indica si existe una petición POSTs
-   * @var boolean
-   */
+    /**
+     * Indica si existe una petición POSTs
+     * @var boolean
+     */
     protected $is_post = false;
-    /*
-   * Almacena las variables POST como objetos Post_Value
-   * @var array
-   */
+    /**
+     * Almacena las variables POST como objetos Post_Value
+     * @var array
+     */
     protected $post = array();
-    /*
-   * Indica la cantidad de variables POST
-   * @var integer
-   */
+    /**
+     * Indica la cantidad de variables POST
+     * @var integer
+     */
     protected $post_count = 0;
-    /*
-   * Indica si se han adjuntado archivos vía POST
-   * @var boolean
-   */
+    /**
+     * Indica si se han adjuntado archivos vía POST
+     * @var boolean
+     */
     protected $has_files = false;
-    /*
-   * Alias a _FILES
-   * @var array
-   */
+    /**
+     * Alias a _FILES
+     * @var array
+     */
     protected $files = array();
-    /*
-   * Conteo de variables en $this->files
-   * @var integer
-   */
+    /**
+     * Conteo de variables en $this->files
+     * @var integer
+     */
     protected $files_count = 0;
     /**
      * Constructor del controlador.
@@ -81,8 +81,6 @@ abstract class Controller
         return 'Controlador ' . get_called_class();
     }
 
-
-
     /**
      * Invocamos al controlador
      * @return boolean
@@ -91,8 +89,6 @@ abstract class Controller
     {
         return $this->main();
     }
-
-
 
     /**
      * Evitamos la clonación de controladores.
@@ -119,13 +115,10 @@ abstract class Controller
      * @return mixed
      */
     abstract protected function main();
-} // class Controller
-
+}
 
 /**
  * Excepción única de la clase Controller
  * @access private
  */
-class Controller_Exception extends \Exception
-{
-}
+class Controller_Exception extends \Exception { }

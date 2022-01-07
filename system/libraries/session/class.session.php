@@ -1,15 +1,6 @@
 <?php
 
-/**
- * Control de sesiones y cookies
- * @package class.session.php
- * @author Cody Roodaka <roodakazo@gmail.com>
- * @version  $Revision: 0.0.1
- * @access public
- */
-
 namespace Framework;
-
 
 final class Session
 {

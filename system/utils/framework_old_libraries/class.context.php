@@ -12,11 +12,6 @@ namespace Framework;
 
 final class Context
 {
-    /**
-     * Cantidad de Contextos o Alias cargados
-     * @var integer
-     */
-    public static $count = 0;
 
     /**
      * Configuración del componente
@@ -26,11 +21,11 @@ final class Context
 
     /**
      * Llamamos a la función definitoria del contexto.
-     * @param string $function Contexto objetivo
+     * @param string|array $function Contexto objetivo
      * @return boolean|mixed
      * @author Cody Roodaka <roodakazo@gmail.com>
      */
-    public static function check($function, $forced_arguments = null)
+    public static function check(string|array $function, $forced_arguments = null)
     {
         if (is_array($function) === true) {
             $functions_count = count($function);

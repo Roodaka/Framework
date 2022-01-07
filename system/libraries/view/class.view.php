@@ -37,7 +37,6 @@ final class View
 
     protected static $lang;
 
-
     public static function init() {
         if (is_file(APP_PATH . 'views/templates/framework_header.html') === true) {
             self::$templates[] = 'framework_header';
@@ -57,9 +56,7 @@ final class View
         } else {
             self::$variables[$key] = $value;
         }
-    } // public static function add_template();
-
-
+    }
 
     /**
      * Agregamos un archivo para que sea cargado en el header
@@ -70,15 +67,12 @@ final class View
     public static function add_file($type, $name)
     {
         self::$files[$type][] = $name;
-    } // public static function add_file();
-
-
+    }
 
     public static function set_lang($lang)
     {
         self::$lang = $lang;
     }
-
 
     /**
      * Agregar una nueva plantilla para mostrar
@@ -88,9 +82,7 @@ final class View
     public static function add_template($template)
     {
         self::$templates[] = $template;
-    } // public static function add_template();
-
-
+    }
 
     /**
      * Cargamos todos los archivos de idioma solicitados
@@ -121,8 +113,6 @@ final class View
         }
     }
 
-
-
     /**
      * Reiniciamos la clase borrando las variables y plantillas asignadas
      * @return nothing
@@ -132,9 +122,7 @@ final class View
         self::$variables = array();
         self::$templates = array();
         self::$files = array('js' => array(), 'css' => array(), 'lang' => array());
-    } // public static function clear();
-
-
+    }
 
     /**
      * Mostramos todas las plantillas cargadas
@@ -144,7 +132,7 @@ final class View
     public static function show()
     {
         if (count(self::$templates) >= 1) {
-            self::add_key('system', require_once(APP_PATH . 'configurations/global.php'));
+            self::add_key(['system' => require_once(APP_PATH . 'configurations/global.php')]);
             self::add_key('core_files', self::$files);
 
             $latte = new \Latte\Engine;
@@ -161,6 +149,7 @@ final class View
                 self::$templates[] = 'framework_footer';
             }
 
+            var_dump(self::$variables);
             foreach (self::$templates as $template) {
                 $latte->render(APP_PATH . 'views/templates/' . $template . '.html', self::$variables);
             }
@@ -171,14 +160,11 @@ final class View
                 echo json_encode(self::$variables);
             }
         }
-    } // public function show();
-} // class View();
-
+    }
+}
 
 /**
  * Excepción exclusiva del componente View
  * @access private
  */
-class View_Exception extends \Exception
-{
-} // class View_Exception();
+class View_Exception extends \Exception { }

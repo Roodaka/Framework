@@ -11,11 +11,11 @@
  */
 function url($controller, $method = null, $value = null, $page = null, $title = null)
 {
-    return 'index.php?' . Framework\Core::KEY_CONTROLLER . '=' . $controller
-        . (($value !== null) ? '&' . Framework\Core::KEY_VALUE . '=' . $value : '')
+    return 'index.php?' . Framework\Router::KEY_CONTROLLER . '=' . $controller
+        . (($value !== null) ? '&' . Framework\Router::KEY_VALUE . '=' . $value : '')
         . (($title !== null) ? '-' . $title : '')
-        . (($method !== null) ? '&' . Framework\Core::KEY_METHOD . '=' . $method : '')
-        . (((int) $page >= 1) ? '&' . Framework\Core::KEY_PAGE . '=' . $page : '');
+        . (($method !== null) ? '&' . Framework\Router::KEY_METHOD . '=' . $method : '')
+        . (((int) $page >= 1) ? '&' . Framework\Router::KEY_PAGE . '=' . $page : '');
 } // function url();
 
 
@@ -88,9 +88,9 @@ function exception_handler($exception)
 function is_routing($controller, $method = null)
 {
     if ($method !== null) {
-        return ($controller === \Framework\Core::$target_routing['controller'] && $method === \Framework\Core::$target_routing['method']);
+        return ($controller === \Framework\Router::$target_routing['controller'] && $method === \Framework\Router::$target_routing['method']);
     } else {
-        return ($controller === \Framework\Core::$target_routing['controller']);
+        return ($controller === \Framework\Router::$target_routing['controller']);
     }
 }
 
@@ -100,7 +100,7 @@ function is_routing($controller, $method = null)
  */
 function get_routing_controller()
 {
-    return \Framework\Core::$target_routing['controller'];
+    return \Framework\Router::$target_routing['controller'];
 }
 
 /**
@@ -109,7 +109,7 @@ function get_routing_controller()
  */
 function get_routing_method()
 {
-    return \Framework\Core::$target_routing['method'];
+    return \Framework\Router::$target_routing['method'];
 }
 
 /**
@@ -120,9 +120,9 @@ function get_routing_method()
 function get_routing_value($return_int = true)
 {
     if ($return_int === true) {
-        return (int) \Framework\Core::$target_routing['value'];
+        return (int) \Framework\Router::$target_routing['value'];
     } else {
-        return \Framework\Core::$target_routing['value'];
+        return \Framework\Router::$target_routing['value'];
     }
 }
 
@@ -132,5 +132,5 @@ function get_routing_value($return_int = true)
  */
 function get_routing_page()
 {
-    return (int) \Framework\Core::$target_routing['page'];
+    return (int) \Framework\Router::$target_routing['page'];
 }

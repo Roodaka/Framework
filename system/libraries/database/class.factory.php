@@ -41,7 +41,7 @@ final class Factory
      * @param bool $protected Lo marcamos para no ser limpiado en la redirección
      * @return reference
      */
-    final public static function &create($model, $id = null, $specified_fields = null, $autoload = true, $protected = false)
+    final public static function &create(string $model, int $id = null, array $specified_fields = [], bool $autoload = true, bool $protected = false)
     {
         if ($model !== null) {
             if (class_exists($model) === false) {
@@ -52,9 +52,7 @@ final class Factory
                 }
             }
 
-            // Nombre completo del Modelo
             $modelname = '\Application\Models\\' . $model;
-            // Clave por la cual el modelo será identificado en el arreglo de referencias.
             $modelkey = $model . (($id !== null) ? '-' . $id : '');
             if ($protected === false && $id !== null) {
                 if (isset(self::$models[$modelkey]) === false) {
@@ -77,9 +75,7 @@ final class Factory
         } else {
             throw new Factory_Exception('Se ha solicitado un nombre de Modelo nulo.');
         }
-    } // final public static function create();
-
-
+    }
 
     /**
      * Borramos todas las instancias
@@ -88,9 +84,7 @@ final class Factory
     final public static function clear()
     {
         self::$models = array();
-    } // final public static function clear()
-
-
+    } 
 
     /**
      * Procesamos un arreglo de ID's llevándolos a ser Modelos.
@@ -117,9 +111,7 @@ final class Factory
         }
 
         return $classes;
-    } // final public static function create_from_array();
-
-
+    }
 
     /**
      * Realizamos una consulta rápida a la base de datos para obtener ID's u objetos
@@ -152,12 +144,10 @@ final class Factory
             return false;
         }
     }
-} // final class Factory();
+}
 
 /**
  * Excepción única del componente Factory
  * @access private
  */
-class Factory_Exception extends \Exception
-{
-}
+class Factory_Exception extends \Exception { }

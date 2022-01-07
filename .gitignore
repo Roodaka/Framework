@@ -3,3 +3,4 @@
 /robots.txt
 /vendor/
 .env
+debug.log

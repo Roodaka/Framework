@@ -10,7 +10,7 @@
 
 namespace Framework;
 
-final class Core
+final class Router
 {
     private static $default_route;
     private static $error_route;
@@ -66,14 +66,12 @@ final class Core
     const KEY_VALUE = 'v';
     const KEY_PAGE = 'p';
 
-
-
     /**
      * Iniciamos el Núcleo del sistema
      * @param array $initial_data Arreglo con los datos (tiempo y RAM) iniciales
      * @return nothing
      */
-    public static function init()
+    public static function init(): void
     {
         // TODO: Load configs from DB
         $config = require_once(APP_PATH . 'routes.php');
@@ -86,17 +84,14 @@ final class Core
         array_pop($path);
         self::$url_fullpath = ((isset($_SERVER['REQUEST_SCHEME'])) ? $_SERVER['REQUEST_SCHEME'] : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/' . implode('/', $path) . '/';
 
-        // Cargamos configuraciones del sitio y las preferencias del usuario
         self::route();
-    } // public static function init();
-
-
+    }
 
     /**
      * Cargador dinámico de controladores
      * @return nothing
      */
-    private static function route()
+    private static function route(): void
     {
         // Controlador
         if (isset($_GET[self::KEY_CONTROLLER])) {
@@ -125,9 +120,7 @@ final class Core
 
         // Renderizado final.
         View::show();
-    } // protected static function route();
-
-
+    }
 
     /**
      * Cargamos el controlador objetivo del router.
@@ -179,8 +172,6 @@ final class Core
         }
     }
 
-
-
     /**
      * Solicitar un cambio de controlador
      * @param string $controller Controlador objetivo
@@ -208,9 +199,7 @@ final class Core
         } else {
             header('Location: ' . self::$url_fullpath . url($new_route['controller'], $new_route['method'], $new_route['value'], $new_route['page'], null));
         }
-    } // public static function redirect();
-
-
+    }
 
     /**
      * Verificamos la ruta objetivo sea válida
@@ -231,9 +220,7 @@ final class Core
             self::handle_error('El archivo de controlador ' . $controller . ' no existe.', self::ERROR_FILE);
         }
         return (bool) (self::$error_code === null);
-    } // private static function is_valid_route();
-
-
+    }
 
     /**
      * Método para el manejo interno de errores.
