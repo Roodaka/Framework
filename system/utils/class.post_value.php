@@ -120,4 +120,13 @@ class Post_Value
             return $this->text();
         }
     }
+
+    /**
+     * Validación y conversión a booleano.
+     * @return boolean
+     */
+    public function boolean()
+    {
+        return filter_var($this->raw_value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+    }
 }

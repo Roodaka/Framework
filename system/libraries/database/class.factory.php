@@ -79,9 +79,9 @@ final class Factory
 
     /**
      * Borramos todas las instancias
-     * @return nothing
+     * @return void
      */
-    final public static function clear()
+    final public static function clear(): void
     {
         self::$models = array();
     } 
@@ -93,9 +93,9 @@ final class Factory
      * @param null|array $fields Campos específicos a ser cargados por cada Modelo
      * @param boolean $autoload Autocargamos los datos
      * @param boolean $return_array Solicitamos los datos como un arreglo
-     * @return nothing
+     * @return array
      */
-    final public static function create_from_array($model, $target_ids = array(), $fields = null, $autoload = true, $return_array = false)
+    final public static function create_from_array($model, $target_ids = array(), $fields = null, $autoload = true, $return_array = false): array
     {
         $classes = array();
         if (is_array($target_ids) === false) {
@@ -121,7 +121,7 @@ final class Factory
      * @param null|array $limits Límites de otención
      * @param boolean $autoload Autocargamos los datos
      * @param boolean $return_array Solicitamos los datos como un arreglo
-     * @return nothing
+     * @return mixed
      */
     final public static function create_from_database($model = null, $condition = null, $order = null, $limits = null, $autoload = true, $return_array = true)
     {

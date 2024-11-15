@@ -14,7 +14,7 @@ final class View
 {
     /**
      * Variables internas del componente
-     * @var Array
+     * @var array
      */
     protected static $variables = array();
 
@@ -26,7 +26,7 @@ final class View
 
     /**
      * Archivos Extra
-     * @var Array
+     * @var array
      */
     // TODO: check this
     protected static $files = array(
@@ -45,11 +45,11 @@ final class View
 
     /**
      * Agregar una clave con su respectivo valor al arreglo de claves
-     * @param string $key Clave a asignar
+     * @param string | array $key Clave a asignar
      * @param mixed $value Valor de la clave
-     * @return nothing
+     * @return void
      */
-    public static function add_key($key, $value = null)
+    public static function add_key(string | array $key, $value = null)
     {
         if (is_array($key) and $value === null) {
             self::$variables += $key;
@@ -62,7 +62,7 @@ final class View
      * Agregamos un archivo para que sea cargado en el header
      * @param string $type Tipo de archivo a agregar.
      * @param string $name Ruta del archivo
-     * @return nothing
+     * @return void
      */
     public static function add_file($type, $name)
     {
@@ -77,7 +77,7 @@ final class View
     /**
      * Agregar una nueva plantilla para mostrar
      * @param string $template Plantilla a asignar
-     * @return nothing
+     * @return void
      */
     public static function add_template($template)
     {
@@ -115,7 +115,7 @@ final class View
 
     /**
      * Reiniciamos la clase borrando las variables y plantillas asignadas
-     * @return nothing
+     * @return void
      */
     public static function clear()
     {
@@ -127,7 +127,7 @@ final class View
     /**
      * Mostramos todas las plantillas cargadas
      * @param boolean $return Indica si retornar o no el HTML generado
-     * @return nothing
+     * @return void
      */
     public static function show()
     {
@@ -149,7 +149,6 @@ final class View
                 self::$templates[] = 'framework_footer';
             }
 
-            var_dump(self::$variables);
             foreach (self::$templates as $template) {
                 $latte->render(APP_PATH . 'views/templates/' . $template . '.html', self::$variables);
             }

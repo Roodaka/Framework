@@ -15,7 +15,7 @@ final class Context
 
     /**
      * Configuración del componente
-     * @var Array
+     * @var array
      */
     protected static $callbacks = array();
 
@@ -51,14 +51,13 @@ final class Context
      * Agregamos una función de contexto
      * @param string $name Nombre del conexto
      * @param string $function Función objetivo
-     * @return nothing
+     * @return void
      * @author Cody Roodaka <roodakazo@gmail.com>
      */
     public static function add($name, $function, $arguments = null)
     {
         if (is_callable($function) === true) {
             self::$callbacks[$name] = array($function, $arguments);
-            ++self::$count;
         } else {
             throw new Context_Exception('Se intenta agregar un contexto inv&aacute;lido ' . json_encode($function) . '.');
         }

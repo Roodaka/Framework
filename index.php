@@ -28,7 +28,7 @@ if ($_ENV['DB_DRIVER'] !== 'none') {
     \Framework\Database::init();
 }
 
-if ($_ENV['REST_ONLY']) {
+if ($_ENV['REST_ONLY'] !== 'true') {
     require_once(SYSTEM_PATH . 'libraries/view/class.view.php');
     \Framework\View::init();
 }
@@ -41,8 +41,6 @@ if ($_ENV['PHP_ENV'] === 'development') {
     error_reporting(0);
     ini_set('display_errors', false);
 }
-
-
 
 \Framework\Cache::init();
 \Framework\Session::init();

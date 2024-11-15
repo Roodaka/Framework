@@ -36,7 +36,7 @@ class Database
 
     /**
      * Inicializador de la clase
-     * @return nothing
+     * @return void
      */
     public static function init(): void
     {
@@ -98,6 +98,7 @@ class Database
     public static function select($table, $fields, $condition = null, $order = null, $limits = null)
     {
         $cons = 'SELECT ' . (is_array($fields) ? implode(', ', $fields) : $fields) . ' FROM ' . $table . ' ' . self::parse_where($condition) . ' ' . self::parse_order($order) . ' ' . self::parse_limits($limits);
+
         $query = self::do_query($cons);
         if ($query !== false) {
             return new \Framework\Database_Result($query);
@@ -171,7 +172,7 @@ class Database
     /**
      * Ejecutamos una consulta
      * @param string $query Cosulta SQL
-     * @return resource
+     * @return bool|\mysqli_result
      */
     private static function do_query($query)
     {
@@ -185,7 +186,7 @@ class Database
     /**
      * Retornamos un error grave del servidor
      * @param string $query Consulta que origina el error
-     * @return nothing
+     * @return void
      */
     private static function error($error = null)
     {
@@ -297,7 +298,7 @@ class Database
         } elseif (is_null($input)) {
             return 'NULL';
         } elseif (is_array($input)) {
-            return implode(', ', array_map(array('self', 'parse_input'), $input));
+            return implode(', ', array_map(array('\Framework\Database', 'parse_input'), $input));
         } else {
             return '\'' . mysqli_real_escape_string(self::$conn, $input) . '\'';
         }

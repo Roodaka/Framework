@@ -69,7 +69,7 @@ final class Router
     /**
      * Iniciamos el Núcleo del sistema
      * @param array $initial_data Arreglo con los datos (tiempo y RAM) iniciales
-     * @return nothing
+     * @return void
      */
     public static function init(): void
     {
@@ -89,7 +89,7 @@ final class Router
 
     /**
      * Cargador dinámico de controladores
-     * @return nothing
+     * @return void
      */
     private static function route(): void
     {
@@ -129,7 +129,7 @@ final class Router
      * @param string $value Valor o ID
      * @param integer $page Número de página
      * @param boolean $redirected Indica si la llamada es parte de una redirección
-     * @return nothing
+     * @return void
      */
     private static function call_controller($controller = null, $method = 'main', $value = null, $page = 1, $redirected = 0)
     {
@@ -179,7 +179,7 @@ final class Router
      * @param string|integer $value ID solicitado
      * @param integer $page Nro de página
      * @param boolean $http_redirection Solicitar una redirección HTTP o no
-     * @return nothing
+     * @return void
      */
     public static function redirect($controller, $method = null, $value = null, $page = 1, $http_redirection = true)
     {

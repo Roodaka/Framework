@@ -24,7 +24,7 @@ abstract class Controller
     protected $is_post = false;
     /**
      * Almacena las variables POST como objetos Post_Value
-     * @var array
+     * @var \Framework\Utils\Post_Value[]
      */
     protected $post = array();
     /**
@@ -51,12 +51,12 @@ abstract class Controller
      * Constructor del controlador.
      * Asigna las variables POST y FILE.
      * @param boolean $ignore_post Ignorar o no las peticiones POST (por redireccionamiento interno)
-     * @return nothing
+     * @return void
      */
     public function __construct($ignore_post = false)
     {
-        if ($ignore_post === false and $_SERVER['REQUEST_METHOD'] === 'POST') {
-            require(APP_PATH . 'libraries/utils/class.post_value.php');
+        if ($ignore_post !== true and $_SERVER['REQUEST_METHOD'] === 'POST') {
+            require(SYSTEM_PATH . 'utils/class.post_value.php');
             $this->is_post = true;
 
             foreach ($_POST as $key => $value) {
@@ -92,7 +92,7 @@ abstract class Controller
 
     /**
      * Evitamos la clonación de controladores.
-     * @return nothing
+     * @return void
      */
     public function __clone()
     {

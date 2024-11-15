@@ -29,7 +29,7 @@ function url($controller, $method = null, $value = null, $page = null, $title = 
  * @param boolean $protected Proteger el modelo indicado a la limpieza de modelos.
  * @return object Referencia al objeto creado.
  */
-function load_model($model, $id = null, $specified_fields = null, $autoload = true, $protected = false)
+function load_model(string $model, int $id = null, array $specified_fields = [], bool $autoload = true, bool $protected = false)
 {
     return \Framework\Factory::create($model, $id, $specified_fields, $autoload, $protected);
 }
@@ -45,9 +45,9 @@ function load_model($model, $id = null, $specified_fields = null, $autoload = tr
 function paginate($page, $limit)
 {
     if ($page === 1) {
-        $return = array(0, $limit);
+        $return = [0, $limit];
     } else {
-        $return = array((($page - 1) * $limit), $limit);
+        $return = [(($page - 1) * $limit), $limit];
     }
     return $return;
 } // function paginate();
@@ -57,7 +57,7 @@ function paginate($page, $limit)
 /**
  * Agregamos el manejo personalizado de las excepciones
  * @param object $exception Excepción entregada por el sistema
- * @return nothing
+ * @return void
  */
 function exception_handler($exception)
 {
@@ -75,7 +75,7 @@ function exception_handler($exception)
         $last_file = isset($trace['file']) ? $trace['file'] : $last_file;
         $last_line = isset($trace['line']) ? $trace['line'] : $last_line;
         echo '<span>' . str_replace(ROOT_PATH, 'HOME_DIR/', $last_file)
-            . ((isset($trace['class']) && isset($trace['type'])) ? $trace['class'] . $trace['type'] : '') . $trace['function']
+            . ' ' . ((isset($trace['class']) && isset($trace['type'])) ? $trace['class'] . $trace['type'] : '') . $trace['function']
             . '(' . (($_ENV['PHP_ENV'] === 'development') ? '<i>' . json_encode($trace['args']) . '</i>' : '') . ')</span> on <strong>line ' . $last_line . '</strong><br />';
     }
     echo '</p></div>';

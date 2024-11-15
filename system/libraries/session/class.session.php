@@ -18,7 +18,7 @@ final class Session
 
     /**
      * Iniciamos la sesión
-     * @return nothing
+     * @return void
      */
     public static function init(): void
     {
@@ -85,7 +85,7 @@ final class Session
 
     /**
      * Seteamos el modelo de usuario
-     * @return nothing
+     * @return void
      */
     private static function set_user_object($id): void
     {
@@ -143,7 +143,7 @@ final class Session
 
     /**
      * Terminamos la sesión.
-     * @return Nothing
+     * @return void
      */
     public static function end(): void
     {

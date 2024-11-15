@@ -168,7 +168,7 @@ abstract class Model
      */
     protected function load_data(): bool
     {
-        $temp = \Framework\Database::select($this->table, (($this->specified_fields === null) ? $this->fields : array_intersect($this->specified_fields, $this->fields)), array($this->primary_key => $this->id));
+        $temp = \Framework\Database::select($this->table, (!is_array($this->specified_fields) ? $this->fields : array_intersect($this->specified_fields, $this->fields)), array($this->primary_key => $this->id));
         if ($temp !== false) {
             $this->data = $temp->fetch();
             return true;
@@ -216,7 +216,7 @@ abstract class Model
 
     /**
      * Ordenamos que el modelo borre los datos asociados
-     * @return nothing
+     * @return void
      */
     final public function set_to_delete(): void
     {

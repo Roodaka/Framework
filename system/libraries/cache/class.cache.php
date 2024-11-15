@@ -4,12 +4,12 @@ namespace Framework;
 
 class Cache
 {
-    private static \Framework\Cache\Base $handler;
+    private static \Framework\Cache\Base | null $handler = null;
     private static $lifetime = 900; // 15 mins
 
     public static function init(): void
     {
-        if ($_ENV['PHP_ENV'] === 'development') {
+        if ($_ENV['CACHE_DRIVER'] !== 'none') {
             require_once(SYSTEM_PATH . 'libraries/cache/handlers/class.base.php');
 
             if (extension_loaded('apcu') === true or (bool) ini_get('apcu.enabled') === true) {
