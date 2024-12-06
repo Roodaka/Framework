@@ -55,4 +55,4 @@ class Cache
     }
 }
 
-class Cache_Exception extends \Exception { }
+class Cache_Exception extends \Framework\Standard_Exception { }

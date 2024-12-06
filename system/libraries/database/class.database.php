@@ -2,19 +2,19 @@
 
 namespace Framework;
 
-use mysqli;
+use mysqli, mysqli_result;
 
 class Database
 {
     /**
      * Recurso MySQL
-     * @var resource
+     * @var mysqli
      */
-    private static object $conn;
+    private static ?mysqli $conn = null;
 
     /**
      * Cantidad de consultas realizadas
-     * @var integer
+     * @var int
      */
     public static $count = 0;
 
@@ -45,9 +45,8 @@ class Database
                 $_ENV['DB_HOST'],
                 $_ENV['DB_USER'],
                 $_ENV['DB_PASS'],
-                $_ENV['DB_NAME']) or self::error('', 'No se pudo conectar al servidor MySQL');
-        } else {
-            self::$conn = null;
+                $_ENV['DB_NAME']
+            ) or self::error('No se pudo conectar al servidor MySQL');
         }
     }
 
@@ -55,9 +54,9 @@ class Database
 
     /**
      * Desconectar del servidor MySQL
-     * @return boolean
+     * @return bool
      */
-    private static function disconect()
+    private static function disconect(): bool
     {
         return (self::$conn !== null) ? mysqli_close(self::$conn) : true;
     }
@@ -67,20 +66,20 @@ class Database
     /**
      * Procesar una consulta compleja en la base de datos
      * @param string $cons Consulta SQL
-     * @param miexed $values Arreglo con los valores a reemplazar por Parse_vars
-     * @param boolean $ret retornar Array de datos o no.
+     * @param array|string $values Arreglo con los valores a reemplazar por Parse_vars
+     * @param bool $ret retornar Array de datos o no.
      * @return mixed
      */
-    public static function query($raw_query, $values = null, $auto_fetch = false)
+    public static function query($raw_query, $values = null): bool|Database_Result
     {
         $query = self::do_query(($values != null) ? self::parse_vars($raw_query, $values) : $raw_query);
         if (is_bool($query) === true) {
-            return $query;
+            return (bool) $query;
         } elseif (is_object($query) === true) {
-            $query = new \Framework\Database_Result($query);
-            return ($auto_fetch === true) ? $query->fetch() : $query;
+            return new \Framework\Database_Result($query);
         } else {
-            return self::error();
+            self::error();
+            return false;
         }
     }
 
@@ -91,11 +90,11 @@ class Database
      * @param string $table Nombre de la tabla objetivo
      * @param array|string $fields
      * @param array $condition Condicionante para la selección
-     * @param array|integer $order Ordenado
-     * @param array|integer $limit Límite de filas
-     * @return array
+     * @param array|int $order Ordenado
+     * @param array|int $limit Límite de filas
+     * @return bool|Database_Result
      */
-    public static function select($table, $fields, $condition = null, $order = null, $limits = null)
+    public static function select($table, $fields, $condition = null, $order = null, $limits = null): bool|Database_Result
     {
         $cons = 'SELECT ' . (is_array($fields) ? implode(', ', $fields) : $fields) . ' FROM ' . $table . ' ' . self::parse_where($condition) . ' ' . self::parse_order($order) . ' ' . self::parse_limits($limits);
 
@@ -112,15 +111,19 @@ class Database
      * Insertar Datos en una tabla
      * @param string $table Nombre de la tabla
      * @param array $data Arreglo asosiativo con los datos
-     * @return integer|boolean Número de filas afectadas o False.
+     * @return int|bool Número de filas afectadas o False.
      */
-    public static function insert($table, $data)
+    public static function insert($table, $data): int|bool
     {
         if (is_array($data) === true) {
             $cons = 'INSERT INTO ' . $table . ' ( ' . implode(', ', array_keys($data)) . ' ) VALUES ( ' . self::parse_input($data) . ' )';
             $query = self::do_query($cons);
             // Seteamos el resultado,
-            return ($query !== false) ? self::$conn->insert_id : self::error();
+            if ($query !== false) {
+                return self::$conn->insert_id;
+            } else {
+                self::error();
+            }
         }
         return false;
     }
@@ -132,16 +135,16 @@ class Database
      * Borrar una fila
      * @param string $table nombre de la tabla
      * @param array $cond Condicionantes
-     * @return integer|boolean Número de filas afectadas o False.
+     * @return int Número de filas afectadas.
      */
-    public static function delete($table, $cond)
+    public static function delete($table, $cond): int
     {
         if (is_array($cond) === true) {
             $cons = 'DELETE FROM ' . $table . ' ' . self::parse_where($cond);
             $query = self::do_query($cons);
-            return ($query !== false) ? self::$conn->affected_rows : self::error($cons);
+            return ($query !== false) ? (int) self::$conn->affected_rows : 0;
         }
-        return false;
+        return 0;
     }
 
 
@@ -151,9 +154,9 @@ class Database
      * @param string $table nombre de la tabla
      * @param array $array Arreglo asosiativo con los datos
      * @param array $cond Condicionantes
-     * @return integer|boolean Número de filas afectadas o False.
+     * @return int Número de filas afectadas o False.
      */
-    public static function update($table, $array, $cond)
+    public static function update($table, $array, $cond): int
     {
         if (is_array($cond) === true) {
             $fields = array();
@@ -162,9 +165,9 @@ class Database
             }
             $cons = 'UPDATE ' . $table . ' SET ' . implode(', ', $fields) . ' ' . self::parse_where($cond);
             $query = self::do_query($cons);
-            return ($query !== false) ? self::$conn->affected_rows : self::error($cons);
+            return ($query !== false) ? self::$conn->affected_rows : 0;
         }
-        return false;
+        return 0;
     }
 
 
@@ -172,13 +175,20 @@ class Database
     /**
      * Ejecutamos una consulta
      * @param string $query Cosulta SQL
-     * @return bool|\mysqli_result
+     * @return mysqli_result
      */
-    private static function do_query($query)
+    private static function do_query($query): bool|mysqli_result
     {
         ++self::$count;
         self::$last_query = $query;
-        return mysqli_query(self::$conn, $query);
+        $execution = mysqli_query(self::$conn, $query);
+
+        if (!empty(mysqli_error(self::$conn))) {
+            self::error($query);
+        }
+        
+        return $execution;
+        
     }
 
 
@@ -200,7 +210,7 @@ class Database
      * @param array $conditions Arreglo de Condiciones
      * @return string Condiciones ya preparadas
      */
-    private static function parse_where($conditions)
+    private static function parse_where($conditions): string
     {
         if (is_array($conditions)) {
             $array = array();
@@ -227,9 +237,9 @@ class Database
 
     /**
      * Parseo de Límites de consulta.
-     * @param integer|array $limits Número de filas o arreglo de paginado.
+     * @param int|array $limits Número de filas o arreglo de paginado.
      */
-    private static function parse_limits($limits = null)
+    private static function parse_limits($limits = null): string
     {
         $parsed = '';
         if ($limits !== null) {
@@ -248,7 +258,7 @@ class Database
      * Parseo de ordenado de una consulta.
      * @param string|array $order Orden indicado.
      */
-    private static function parse_order($order = null)
+    private static function parse_order($order = null): string
     {
         return ($order !== null) ? 'ORDER BY ' . $order : '';
     }
@@ -264,22 +274,24 @@ class Database
      * @param array $params Arreglo con los parametros a insertar.
      * @author Ignacio Daniel Rostagno <ignaciorostagno@vijona.com.ar>
      */
-    private static function parse_vars($q, $params)
+    private static function parse_vars(string $raw_query, array $params): string 
     {
         // Si no es un arreglo lo convertimos
         if (!is_array($params)) {
             $params = array($params);
         }
+
         //Validamos que tengamos igual numero de parametros que de los necesarios.
-        if (count($params) != preg_match_all("/\?/", $q, $aux)) {
-            throw new Database_Exception('No coinciden la cantidad de parametros necesarios con los provistos en ' . $q);
-            return $q;
+        if (count($params) != preg_match_all("/\?/", $raw_query, $aux)) {
+            throw new Database_Exception('No coinciden la cantidad de parametros necesarios con los provistos en ' . $raw_query);
         }
+
         //Reemplazamos las etiquetas.
         foreach ($params as $param) {
-            $q = preg_replace("/\?/", self::parse_input($param), $q, 1);
+            $raw_query = preg_replace("/\?/", self::parse_input($param), $raw_query, 1);
         }
-        return $q;
+
+        return $raw_query;
     }
 
 
@@ -291,7 +303,7 @@ class Database
      * @return string Cadena segura.
      * @author Ignacio Daniel Rostagno <ignaciorostagno@vijona.com.ar>
      */
-    public static function parse_input($input)
+    public static function parse_input($input): int|string
     {
         if (is_bool($input) or $input === null or empty($input) === true) {
             return (int) $input;
@@ -305,115 +317,11 @@ class Database
     }
 }
 
-
-
 /**
- * Clase para manipular resultados de consultas MySQL, esta clase no es
- * comunmente accesible y es creada por LittleDB
+ * Excepción exclusiva de Database.
  * @author Cody Roodaka <roodakazo@gmail.com>
  * @access private
  */
-class Database_Result
-{
-    /**
-     * Recurso MySQL
-     * @var resource
-     */
-    private $resource = false;
-
-    /**
-     * Resultado de la consulta
-     * @var array
-     */
-    private $result = array();
-
-    /**
-     * Posición
-     * @var integer
-     */
-    private $position = 0;
-
-    /**
-     * Nro de filas
-     * @var integer
-     */
-    public $rows = 0;
-
-
-
-    /**
-     * Inicializar los datos
-     * @param string $query Consulta SQL
-     * @param string $eh Nombre de la función que manipula los errores
-     * @param resource $conn Recurso de conección SQL
-     * @author Cody Roodaka <roodakazo@gmail.com>
-     */
-    public function __construct($resource)
-    {
-        if (is_object($resource) === true) {
-            $this->resource = $resource;
-            $this->position = 0;
-            $this->rows = $this->resource->num_rows;
-            return $this;
-        } else {
-            return false;
-        }
-    }
-
-
-
-    /**
-     * Cuando destruimos el objeto limpiamos la consulta.
-     * @author Ignacio Daniel Rostagno <ignaciorostagno@vijona.com.ar>
-     * @return boolean
-     */
-    public function __destruct()
-    {
-        return $this->free();
-    }
-
-
-
-    /**
-     * Limpiamos la consulta
-     * @author Ignacio Daniel Rostagno <ignaciorostagno@vijona.com.ar>
-     * @return boolean
-     */
-    private function free()
-    {
-        return (is_object($this->resource)) ? $this->resource->free() : true;
-    }
-
-
-
-    /**
-     * Devolvemos el array con los datos de la consulta
-     * @param string $field Campo objetivo.
-     * @param string $default Valor a retornar si el campo no existe o está vacío.
-     * @return array|string Todos los campos o sólo uno
-     */
-    public function fetch($field = null, $default = false)
-    {
-        $this->result[$this->position] = $this->resource->fetch_assoc();
-
-        if ($field !== null) // Pedimos un campo en especial
-        {
-            $result = (isset($this->result[$this->position][$field])) ? $this->result[$this->position][$field] : $default;
-        } else {
-            $result = $this->result[$this->position];
-        }
-        ++$this->position;
-        return $result;
-    }
-}
-
-
-
-/**
- * Excepción exclusiva de LittleDB.
- * @author Cody Roodaka <roodakazo@gmail.com>
- * @access private
- */
-class Database_Exception extends \Exception
+class Database_Exception extends \Framework\Standard_Exception
 {
 }

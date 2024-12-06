@@ -62,18 +62,16 @@ abstract class Model
 
     /**
      * Constructor de la clase.
-     * @param array $data Datos
-     * @param array|null $specified_fields Campos específicos necesarios (para no cargar la totalidad)
-     * @param boolean $autoload Auto cargar los datos de objetivo o no
+     * @param array $specified_fields Campos específicos necesarios (para no cargar la totalidad)
      * @return void
      */
-    public function __construct(int $id = null, array $specified_fields = [], bool $autoload = true)
+    public function __construct(int $id = null, array $specified_fields = [])
     {
         $this->specified_fields = $specified_fields;
         $this->id = $id;
 
-        if ($this->id !== null && $autoload === true) {
-            return $this->load_data();
+        if ($this->id !== null) {
+            $this->load_data();
         }
     }
 
@@ -88,23 +86,18 @@ abstract class Model
     {
         // Borramos
         if ($this->state_deleted === true) {
-            return $this->delete();
-        } else {
-            // Encontramos campos modificados
-            if (count($this->modified_fields) >= 1) {
-                $fields = array();
-                foreach ($this->modified_fields as $field) {
-                    $fields[$field] = $this->data[$field];
-                }
-                // Si los datos fueron cargados mediante un ID, actualizamos, de otra
-                // forma insertamos
-                if ($this->id !== null) {
-                    return \Framework\Database::update($this->table, $fields, array($this->primary_key => $this->id));
-                } else {
-                    return $this->save();
-                }
+            $this->delete();
+        } elseif (count($this->modified_fields) >= 1) {
+            $fields = array();
+            foreach ($this->modified_fields as $field) {
+                $fields[$field] = $this->data[$field];
+            }
+            // Si los datos fueron cargados mediante un ID, actualizamos, de otra
+            // forma insertamos
+            if ($this->id !== null) {
+                \Framework\Database::update($this->table, $fields, array($this->primary_key => $this->id));
             } else {
-                return true;
+                $this->save();
             }
         }
     }
@@ -119,7 +112,7 @@ abstract class Model
         if (in_array($field, $this->fields)) {
             return $this->data[$field];
         } elseif (isset($this->data[$field]) === false) {
-            $query = \Framework\Database::select($this->table, $field, array($this->primary_key => $this->id));
+            $query = \Framework\Database::select($this->table, $field, array($this->primary_key => $this->id))->to_array();
             return ($query !== false) ? $query[$field] : false;
         } else {
             throw new Model_Exception('El campo "' . $field . '" no se encuentra entre los campos predefinidos');
@@ -164,17 +157,16 @@ abstract class Model
 
     /**
      * Cargamos los datos desde la base de datos
-     * @return boolean
+     * @return void
      */
-    protected function load_data(): bool
+    protected function load_data(): void
     {
-        $temp = \Framework\Database::select($this->table, (!is_array($this->specified_fields) ? $this->fields : array_intersect($this->specified_fields, $this->fields)), array($this->primary_key => $this->id));
+        // TODO: doble igual en specified_fields
+        $temp = \Framework\Database::select($this->table, (($this->specified_fields == null) ? $this->fields : array_intersect($this->specified_fields, $this->fields)), array($this->primary_key => $this->id));
         if ($temp !== false) {
-            $this->data = $temp->fetch();
-            return true;
+            $this->data = $temp->to_array();
         } else {
-            throw new Model_Exception('No se pudo cargar los datos del modelo ' . $this->table . '(' . $this->id . ').');
-            return false;
+            throw new Model_Exception(message: 'No se pudo cargar los datos del modelo ' . $this->table . '(' . $this->id . ').');
         }
     }
 
@@ -189,7 +181,7 @@ abstract class Model
 
     /**
      * Seteamos el ID del objeto
-     * @param integer $id ID del objeto.
+     * @param int $id ID del objeto.
      * @return boolean
      */
     final public function set_id(int $id): void
@@ -208,7 +200,7 @@ abstract class Model
     {
         $temp = \Framework\Database::select($this->table, $this->primary_key, array($key => $value));
         if ($temp !== false) {
-            $temp = $temp->fetch();
+            $temp = $temp->to_array();
             return $this->set_id($temp[$this->primary_key]);
         }
         return false;
@@ -226,26 +218,23 @@ abstract class Model
     /**
      * Definimos (o redefinimos) el valor de un campo.
      * @param string|array $field Campo objetivo o arreglo de campos y valores
-     * @param mixed $value Valor a asignar
+     * @param array|string|int $value Valor a asignar
      * @return void
      */
-    final protected function set_field(mixed $field, mixed $value = null): void
+    final protected function set_field(array|string $field, array|string|int $value = null): void
     {
+        if (!in_array($field, $this->fields)) {
+            throw new Model_Exception('El campo "' . $field . '" no se encuentra entre los campos predefinidos');
+        }
+
         if (!is_array($field)) {
-            if (!in_array($field, $this->fields)) {
-                throw new Model_Exception('El campo "' . $field . '" no se encuentra entre los campos predefinidos');
-            } else {
-                $this->data[$field] = $value;
-                $this->modified_fields[] = $field;
-            }
+            $this->data[$field] = $value;
+            $this->modified_fields[] = $field;
         } else {
             foreach ($field as $field => $value) {
-                if (in_array($field, $this->fields)) {
-                    $this->data[$field] = $value;
-                    $this->modified_fields[] = $field;
-                } else {
-                    throw new Model_Exception('El campo "' . $key . '" no se encuentra entre los campos predefinidos');
-                }
+                $this->data[$field] = $value;
+                $this->modified_fields[] = $field;
+
             }
         }
     }
@@ -258,7 +247,7 @@ abstract class Model
     {
         $query = \Framework\Database::select($this->table, 'COUNT(DISTINCT(' . $this->primary_key . ')) AS total', $condition);
         if ($query !== false) {
-            return (int) $query->fetch('total');
+            return (int) $query->to_array('total');
         }
         return 0;
     }
@@ -292,4 +281,6 @@ abstract class Model
  * Excepción única perteneciente a la clase Model
  * @access private
  */
-class Model_Exception extends \Exception { }
+class Model_Exception extends \Framework\Standard_Exception
+{
+}

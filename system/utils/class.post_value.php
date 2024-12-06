@@ -14,7 +14,7 @@ class Post_Value
 {
     /**
      * Valor sin filtrar
-     * @var string|integer
+     * @var string|int
      */
     private $raw_value = null;
     /**
@@ -24,7 +24,7 @@ class Post_Value
 
     /**
      * Constructor de la clase
-     * @param string|integer $value Valor a tratar
+     * @param string|int $value Valor a tratar
      */
     public function __construct($value)
     {
@@ -77,7 +77,7 @@ class Post_Value
 
     /**
      * Conversión a número.
-     * @return integer
+     * @return int
      */
     public function number()
     {
@@ -99,7 +99,7 @@ class Post_Value
     /**
      * Conversión a cadena con filtrado por defecto.
      * @param boolean $return_long Aplicar o no ip2long
-     * @return string|integer
+     * @return string|int
      */
     public function ip($return_long = true)
     {

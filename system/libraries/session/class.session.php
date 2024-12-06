@@ -162,4 +162,4 @@ final class Session
     }
 } 
 
-class Session_Exception extends \Exception { }
+class Session_Exception extends \Framework\Standard_Exception { }

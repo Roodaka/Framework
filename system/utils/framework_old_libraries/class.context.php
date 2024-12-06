@@ -69,6 +69,6 @@ final class Context
  * Excepción exclusiva del componente Context
  * @access private
  */
-class Context_Exception extends \Exception
+class Context_Exception extends \Framework\Standard_Exception
 {
 } // class Context_Exception();

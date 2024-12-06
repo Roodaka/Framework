@@ -26,7 +26,7 @@ final class Factory
 
     /**
      * Conteo de modelos.
-     * @var integer
+     * @var int
      */
     public static $count = 0;
 
@@ -35,45 +35,41 @@ final class Factory
     /**
      * Intentamos recrear el patrón de diseño ObjectPool con unos ligeros cambios
      * @param string $model Modelo a Cargar
-     * @param integer $id Identificador
+     * @param int $id Identificador
      * @param array $specified_fields Campos específicos a cargar por el modelo
      * @param bool $autoload Marcamos la autocarga de datos del modelo.
      * @param bool $protected Lo marcamos para no ser limpiado en la redirección
-     * @return reference
+     * @return object
      */
-    final public static function &create(string $model, int $id = null, array $specified_fields = [], bool $autoload = true, bool $protected = false)
+    final public static function &create(string $model, int $id = null, array $specified_fields = [], bool $autoload = true, bool $protected = false): \Framework\Model
     {
-        if ($model !== null) {
-            if (class_exists($model) === false) {
-                if (file_exists(APP_PATH . 'models/class.' . strtolower($model) . '.php') === true) {
-                    require_once(APP_PATH . 'models/class.' . strtolower($model) . '.php');
-                } else {
-                    throw new Factory_Exception('No se ha podido cargar el modelo ' . $model . '.');
-                }
+        if (class_exists($model) === false) {
+            if (file_exists(APP_PATH . 'models/class.' . strtolower($model) . '.php') === true) {
+                require_once(APP_PATH . 'models/class.' . strtolower($model) . '.php');
+            } else {
+                throw new Factory_Exception('No se ha podido cargar el modelo ' . $model . '.');
             }
+        }
 
-            $modelname = '\Application\Models\\' . $model;
-            $modelkey = $model . (($id !== null) ? '-' . $id : '');
-            if ($protected === false && $id !== null) {
-                if (isset(self::$models[$modelkey]) === false) {
-                    self::$models[$modelkey] = new $modelname($id, $specified_fields, $autoload);
-                    if (self::$models[$modelkey] !== false) {
-                        ++self::$count;
-                    }
+        $modelname = '\Application\Models\\' . $model;
+        $modelkey = $model . (($id !== null) ? '-' . $id : '');
+        if ($protected === false && $id !== null) {
+            if (isset(self::$models[$modelkey]) === false) {
+                self::$models[$modelkey] = new $modelname($id, $specified_fields, $autoload);
+                if (self::$models[$modelkey] !== false) {
                     ++self::$count;
                 }
-                return self::$models[$modelkey];
-            } else {
-                if (isset(self::$handlers[$modelkey]) === false) {
-                    self::$handlers[$modelkey] = new $modelname($id, $specified_fields, $autoload);
-                    if (self::$handlers[$modelkey] !== false) {
-                        ++self::$count;
-                    }
-                }
-                return self::$handlers[$modelkey];
+                ++self::$count;
             }
+            return self::$models[$modelkey];
         } else {
-            throw new Factory_Exception('Se ha solicitado un nombre de Modelo nulo.');
+            if (isset(self::$handlers[$modelkey]) === false) {
+                self::$handlers[$modelkey] = new $modelname($id, $specified_fields, $autoload);
+                if (self::$handlers[$modelkey] !== false) {
+                    ++self::$count;
+                }
+            }
+            return self::$handlers[$modelkey];
         }
     }
 
@@ -84,7 +80,7 @@ final class Factory
     final public static function clear(): void
     {
         self::$models = array();
-    } 
+    }
 
     /**
      * Procesamos un arreglo de ID's llevándolos a ser Modelos.
@@ -118,18 +114,18 @@ final class Factory
      * @param string $model Nombre del modelo a cargar.
      * @param null|array $condition Condicionantes para la consulta MySQL
      * @param null|string $order Valor para el ordenado de los resultados
-     * @param null|array|integer $limits Límites de otención
+     * @param null|array|int $limits Límites de otención
      * @param boolean $autoload Autocargamos los datos
      * @param boolean $return_array Solicitamos los datos como un arreglo
      * @return mixed
      */
-    final public static function create_from_database($model = null, $condition = null, $order = null, $limits = null, $autoload = true, $return_array = true)
+    final public static function create_from_database($model = null, $condition = null, $order = null, $limits = null, $autoload = true, $return_array = true): array|bool|Model
     {
         $object = self::create($model);
         $query = \Framework\Database::select($object->table, $object->primary_key, $condition, $order, $limits);
-        if (!empty($query) && !is_array($query)) {
+        if (!empty($query) && $query->rows > 1) {
             $result = array();
-            while ($row = $query->fetch()) {
+            while ($row = $query->to_array()) {
                 if ($autoload === true) {
                     $temp = self::create($model, $row[$object->primary_key]);
                     $result[] = ($return_array === true) ? $temp->get_array() : $temp;
@@ -138,8 +134,8 @@ final class Factory
                 }
             }
             return $result;
-        } elseif (is_array($query) === true && count($query) === 1) {
-            return self::create($model, $query[$object->primary_key]);
+        } elseif ($query->rows === 1) {
+            return self::create($model, $query->to_array($object->primary_key));
         } else {
             return false;
         }
@@ -150,4 +146,6 @@ final class Factory
  * Excepción única del componente Factory
  * @access private
  */
-class Factory_Exception extends \Exception { }
+class Factory_Exception extends \Framework\Standard_Exception
+{
+}

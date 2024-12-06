@@ -48,7 +48,7 @@ final class Router
     public static $url_fullpath = null;
     /**
      * Código de error actual
-     * @var integer
+     * @var int
      */
     public static $error_code = null;
 
@@ -74,7 +74,7 @@ final class Router
     public static function init(): void
     {
         // TODO: Load configs from DB
-        $config = require_once(APP_PATH . 'routes.php');
+        $config = require(APP_PATH . 'routes.php');
         self::$avaiable_controllers = $config['routes'];
         self::$default_route = $config['default_route'];
         self::$error_route = $config['error_route'];
@@ -127,7 +127,7 @@ final class Router
      * @param string $controller Controlador Objetivo
      * @param string $method Método a ejecutar
      * @param string $value Valor o ID
-     * @param integer $page Número de página
+     * @param int $page Número de página
      * @param boolean $redirected Indica si la llamada es parte de una redirección
      * @return void
      */
@@ -176,8 +176,8 @@ final class Router
      * Solicitar un cambio de controlador
      * @param string $controller Controlador objetivo
      * @param string $method Método objetivo
-     * @param string|integer $value ID solicitado
-     * @param integer $page Nro de página
+     * @param string|int $value ID solicitado
+     * @param int $page Nro de página
      * @param boolean $http_redirection Solicitar una redirección HTTP o no
      * @return void
      */
@@ -224,8 +224,8 @@ final class Router
 
     /**
      * Método para el manejo interno de errores.
-     * @param integer $error_code Código de error
-     * @param integer $force_close Forzar fin de ejecución
+     * @param int $error_code Código de error
+     * @param int $force_close Forzar fin de ejecución
      * @param string $message Mensaje opcional
      * @return void
      */
@@ -242,4 +242,4 @@ final class Router
     }
 }
 
-class Core_Exception extends \Exception { }
+class Core_Exception extends \Framework\Standard_Exception { }

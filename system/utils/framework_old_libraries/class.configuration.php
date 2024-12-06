@@ -83,6 +83,6 @@ final class Configuration
  * Excepción exclusiva del componente Configuration
  * @access private
  */
-class Configuration_Exception extends \Exception
+class Configuration_Exception extends \Framework\Standard_Exception
 {
 } // class Context_Exception();

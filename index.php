@@ -13,6 +13,7 @@ $dotenv->load();
 // Cargamos las funciones básicas del núcleo
 require(SYSTEM_PATH . 'functions/core.php');
 
+require_once(SYSTEM_PATH . 'libraries/class.exception.php');
 set_exception_handler('exception_handler');
 
 require_once(SYSTEM_PATH . 'libraries/cache/class.cache.php');
@@ -25,6 +26,7 @@ if ($_ENV['DB_DRIVER'] !== 'none') {
     require_once(SYSTEM_PATH . 'libraries/database/class.model.php');
     require_once(SYSTEM_PATH . 'libraries/database/class.factory.php');
     require_once(SYSTEM_PATH . 'libraries/database/class.database.php');
+    require_once(SYSTEM_PATH . 'libraries/database/class.database_result.php');
     \Framework\Database::init();
 }
 

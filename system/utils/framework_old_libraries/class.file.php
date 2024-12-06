@@ -16,7 +16,7 @@ class File
     private $configuration = array();
     /**
      * Código de error actual
-     * @var integer
+     * @var int
      */
     private $error = null;
 

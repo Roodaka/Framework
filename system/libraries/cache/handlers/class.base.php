@@ -14,13 +14,13 @@ abstract class Base
      * Cachear nuevos datos.
      * @param string $name Nombre de la variable
      * @param array $data Datos asignar
-     * @param integer $expires Vida de este cache
+     * @param int $expires Vida de este cache
      * @return boolean Resultado de la operación.
      */
     abstract public function set(string $name, mixed $data, int $lifetime): bool;
     /**
      * Obtener el tamaño total del cache actual
-     * @return integer Tamaño en Bytes
+     * @return int Tamaño en Bytes
      */
     abstract public function size(): int;
     /**

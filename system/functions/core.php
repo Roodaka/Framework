@@ -23,13 +23,13 @@ function url($controller, $method = null, $value = null, $page = null, $title = 
 /**
  * Crear un modelo.
  * @param string $name Nombre del modelo
- * @param integer $id Identificador del modelo (opcional)
+ * @param int $id Identificador del modelo (opcional)
  * @param array|string $specified_fields Campos específicos a cargar (opcional)
  * @param boolean $autoload Auto cargar los datos del modelo
  * @param boolean $protected Proteger el modelo indicado a la limpieza de modelos.
  * @return object Referencia al objeto creado.
  */
-function load_model(string $model, int $id = null, array $specified_fields = [], bool $autoload = true, bool $protected = false)
+function load_model(string $model, int $id = null, array $specified_fields = [], bool $autoload = true, bool $protected = false): \Framework\Model
 {
     return \Framework\Factory::create($model, $id, $specified_fields, $autoload, $protected);
 }
@@ -42,7 +42,7 @@ function load_model(string $model, int $id = null, array $specified_fields = [],
  * @param int $limit Límite de resultados por página
  * @return array
  */
-function paginate($page, $limit)
+function paginate($page, $limit): array
 {
     if ($page === 1) {
         $return = [0, $limit];
@@ -59,7 +59,7 @@ function paginate($page, $limit)
  * @param object $exception Excepción entregada por el sistema
  * @return void
  */
-function exception_handler($exception)
+function exception_handler($exception): void
 {
     echo '<div>
    <h3>'
@@ -85,7 +85,7 @@ function exception_handler($exception)
  * Chequeamos si estamos en una ruta específica
  * @return boolean
  */
-function is_routing($controller, $method = null)
+function is_routing($controller, $method = null): bool
 {
     if ($method !== null) {
         return ($controller === \Framework\Router::$target_routing['controller'] && $method === \Framework\Router::$target_routing['method']);
@@ -98,7 +98,7 @@ function is_routing($controller, $method = null)
  * Obtener el nombre del controlador actual.
  * @return string
  */
-function get_routing_controller()
+function get_routing_controller(): string
 {
     return \Framework\Router::$target_routing['controller'];
 }
@@ -107,7 +107,7 @@ function get_routing_controller()
  * Obtener el nombre del método actual.
  * @return string
  */
-function get_routing_method()
+function get_routing_method(): string
 {
     return \Framework\Router::$target_routing['method'];
 }
@@ -115,9 +115,9 @@ function get_routing_method()
 /**
  * Obtener el nombre del controlador actual.
  * @param boolean $return_int Exigir el retorno de un número o de una cadena
- * @return string|integer
+ * @return string|int
  */
-function get_routing_value($return_int = true)
+function get_routing_value($return_int = true): string|int
 {
     if ($return_int === true) {
         return (int) \Framework\Router::$target_routing['value'];
@@ -128,9 +128,9 @@ function get_routing_value($return_int = true)
 
 /**
  * Obtener el número de página actual
- * @return integer
+ * @return int
  */
-function get_routing_page()
+function get_routing_page(): int
 {
     return (int) \Framework\Router::$target_routing['page'];
 }

@@ -10,34 +10,49 @@
 
 namespace Framework;
 
+
+enum Return_Types
+{
+    case HTML;
+    case JSON;
+}
+
 final class View
 {
+    /**
+     * Definir el tipo de salida (JSON, HTML)
+     * @var Return_Types
+     */
+    public static Return_Types $return_type = Return_Types::HTML;
+
     /**
      * Variables internas del componente
      * @var array
      */
-    protected static $variables = array();
+    protected static array $variables = array();
 
     /**
      * Arreglo con plantillas
      * @var array
      */
-    protected static $templates = array();
+    protected static array $templates = array();
 
     /**
      * Archivos Extra
      * @var array
      */
     // TODO: check this
-    protected static $files = array(
+    protected static array $files = array(
         'js' => array(),
         'css' => array(),
         'lang' => array()
     );
 
-    protected static $lang;
+    protected static string $lang;
 
-    public static function init() {
+
+    public static function init(): void
+    {
         if (is_file(APP_PATH . 'views/templates/framework_header.html') === true) {
             self::$templates[] = 'framework_header';
         }
@@ -49,7 +64,7 @@ final class View
      * @param mixed $value Valor de la clave
      * @return void
      */
-    public static function add_key(string | array $key, $value = null)
+    public static function add_key(string|array $key, $value = null): void
     {
         if (is_array($key) and $value === null) {
             self::$variables += $key;
@@ -64,12 +79,12 @@ final class View
      * @param string $name Ruta del archivo
      * @return void
      */
-    public static function add_file($type, $name)
+    public static function add_file($type, $name): void
     {
         self::$files[$type][] = $name;
     }
 
-    public static function set_lang($lang)
+    public static function set_lang($lang): void
     {
         self::$lang = $lang;
     }
@@ -79,7 +94,7 @@ final class View
      * @param string $template Plantilla a asignar
      * @return void
      */
-    public static function add_template($template)
+    public static function add_template($template): void
     {
         self::$templates[] = $template;
     }
@@ -89,35 +104,35 @@ final class View
      * @param string $lang Idioma forzado
      * @return array
      */
-    private static function load_language($lang = 'spanish')
+    private static function load_language($lang = 'spanish'): array
     {
         $directory = APP_PATH . 'views/languages/';
-        if (is_dir($directory) === true) {
-            if (is_file($directory . strtolower($lang) . '.json')) {
-                $result = json_decode(file_get_contents($directory . strtolower($lang) . '.json'), true);
-                if (count(self::$files['lang']) >= 1) {
-                    foreach (self::$files['lang'] as $file) {
-                        if (is_file($directory . $file . '.json')) {
-                            $result += json_decode(file_get_contents($directory . $file . '.json'), true);
-                        } else {
-                            throw new View_Exception('El archivo de idiomas ' . $directory . $file . '.json no existe.');
-                        }
-                    }
-                }
-                return $result;
-            } else {
-                throw new View_Exception('El archivo principal de idiomas ' . $directory . $lang . '.json no existe.');
-            }
-        } else {
+        if (!is_dir($directory) === true) {
             throw new View_Exception('El directorio de idiomas ' . $directory . ' no existe.');
         }
+
+        if (!is_file($directory . strtolower($lang) . '.json')) {
+            throw new View_Exception('El archivo principal de idiomas ' . $directory . $lang . '.json no existe.');
+        }
+
+        $result = json_decode(file_get_contents($directory . strtolower($lang) . '.json'), true);
+        if (count(self::$files['lang']) >= 1) {
+            foreach (self::$files['lang'] as $file) {
+                if (!is_file($directory . $file . '.json')) {
+                    throw new View_Exception('El archivo de idiomas ' . $directory . $file . '.json no existe.');
+                }
+
+                $result += json_decode(file_get_contents($directory . $file . '.json'), true);
+            }
+        }
+        return $result;
     }
 
     /**
      * Reiniciamos la clase borrando las variables y plantillas asignadas
      * @return void
      */
-    public static function clear()
+    public static function clear(): void
     {
         self::$variables = array();
         self::$templates = array();
@@ -129,9 +144,9 @@ final class View
      * @param boolean $return Indica si retornar o no el HTML generado
      * @return void
      */
-    public static function show()
+    public static function show(): void
     {
-        if (count(self::$templates) >= 1) {
+        if (self::$return_type === Return_Types::HTML && count(self::$templates) >= 1) {
             self::add_key(['system' => require_once(APP_PATH . 'configurations/global.php')]);
             self::add_key('core_files', self::$files);
 
@@ -152,12 +167,8 @@ final class View
             foreach (self::$templates as $template) {
                 $latte->render(APP_PATH . 'views/templates/' . $template . '.html', self::$variables);
             }
-        } else // Consideramos una respuesta AJAX.
-        {
-            //TODO: Considerar idiomas
-            if (count(self::$variables) >= 1) {
-                echo json_encode(self::$variables);
-            }
+        } elseif (self::$return_type === Return_Types::JSON && count(self::$variables) >= 1) {
+            echo json_encode(self::$variables);
         }
     }
 }
@@ -166,4 +177,6 @@ final class View
  * Excepción exclusiva del componente View
  * @access private
  */
-class View_Exception extends \Exception { }
+class View_Exception extends \Framework\Standard_Exception
+{
+}

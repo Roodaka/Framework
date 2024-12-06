@@ -29,7 +29,7 @@ abstract class Controller
     protected array $post = array();
     /**
      * Indica la cantidad de variables POST
-     * @var integer
+     * @var int
      */
     protected $post_count = 0;
     /**
@@ -44,7 +44,7 @@ abstract class Controller
     protected $files = array();
     /**
      * Conteo de variables en $this->files
-     * @var integer
+     * @var int
      */
     protected $files_count = 0;
     /**
@@ -121,4 +121,4 @@ abstract class Controller
  * Excepción única de la clase Controller
  * @access private
  */
-class Controller_Exception extends \Exception { }
+class Controller_Exception extends \Framework\Standard_Exception { }

@@ -15,9 +15,9 @@ class SecureHash
      * @param   string  $salt
      * @param   int     $stretch_cost
      */
-    public function create_hash($password, &$salt = '', $stretch_cost = 10)
+    public function create_hash($password, $stretch_cost = 10): string
     {
-        $salt = strlen($salt) != 21 ? $this->_create_salt() : $salt;
+        $salt = $this->_create_salt();
         if (function_exists('crypt') && defined('CRYPT_BLOWFISH')) {
             return crypt($password, '$2a$' . $stretch_cost . '$' . $salt . '$');
         }
@@ -35,7 +35,7 @@ class SecureHash
      * @param string $hashed_pass The hashed password pulled from the database
      * @param string $salt The salt used to generate the encrypted password
      */
-    public function validate_hash($pass, $hashed_pass, $salt)
+    public function validate_hash($pass, $hashed_pass, $salt): bool
     {
         return $hashed_pass === $this->create_hash($pass, $salt);
     }
@@ -45,7 +45,7 @@ class SecureHash
      * @access  protected
      * @return  string
      */
-    protected function _create_salt()
+    protected function _create_salt(): string
     {
         $salt = $this->_pseudo_rand(128);
         return substr(preg_replace('/[^A-Za-z0-9_]/is', '.', base64_encode($salt)), 0, 21);
@@ -56,7 +56,7 @@ class SecureHash
      * @access  public
      * @param   int     $length
      */
-    protected function _pseudo_rand($length)
+    protected function _pseudo_rand($length): string
     {
         if (function_exists('openssl_random_pseudo_bytes')) {
             $is_strong = false;
@@ -82,7 +82,7 @@ class SecureHash
      * @param   string  $salt
      * @return  string
      */
-    private function _create_hash($password, $salt)
+    private function _create_hash($password, $salt): string
     {
         $hash = '';
         for ($i = 0; $i < 20000; $i++) {
@@ -92,4 +92,6 @@ class SecureHash
     }
 }
 
-class SecureHash_Exception extends \Exception { }
+class SecureHash_Exception extends \Framework\Standard_Exception
+{
+}

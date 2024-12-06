@@ -3,6 +3,7 @@
     "description": "simple php framework",
     "type": "project",
     "license": "apache",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "Cody Roodaka",
