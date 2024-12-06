@@ -18,6 +18,9 @@ class Paginator
      * @param int $total Cantidad total de nodos
      * @param int $nodes_x_page Cantidad de nodos cargados por página
      * @param int $show Cantidad de Páginas a listar.
+     * @param string $controller Controlador a llamar
+     * @param string $method Metodo a llamar
+     * @param string $method Valor de ruta
      * @author Cody Roodaka <roodakazo@hotmail.com>
      */
     public static function init($total_nodes, $nodes_x_page, $controller, $method = 'main', $value = null)

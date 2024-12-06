@@ -246,7 +246,7 @@ class Database
 
     /**
      * Parseo de ordenado de una consulta.
-     * @param integer|array $order Orden indicado.
+     * @param string|array $order Orden indicado.
      */
     private static function parse_order($order = null)
     {
@@ -291,7 +291,7 @@ class Database
      * @return string Cadena segura.
      * @author Ignacio Daniel Rostagno <ignaciorostagno@vijona.com.ar>
      */
-    private static function parse_input($input)
+    public static function parse_input($input)
     {
         if (is_bool($input) or $input === null or empty($input) === true) {
             return (int) $input;

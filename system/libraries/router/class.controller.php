@@ -26,7 +26,7 @@ abstract class Controller
      * Almacena las variables POST como objetos Post_Value
      * @var \Framework\Utils\Post_Value[]
      */
-    protected $post = array();
+    protected array $post = array();
     /**
      * Indica la cantidad de variables POST
      * @var integer

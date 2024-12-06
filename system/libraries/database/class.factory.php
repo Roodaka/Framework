@@ -117,8 +117,8 @@ final class Factory
      * Realizamos una consulta rápida a la base de datos para obtener ID's u objetos
      * @param string $model Nombre del modelo a cargar.
      * @param null|array $condition Condicionantes para la consulta MySQL
-     * @param null|array $order Valor para el ordenado de los resultados
-     * @param null|array $limits Límites de otención
+     * @param null|string $order Valor para el ordenado de los resultados
+     * @param null|array|integer $limits Límites de otención
      * @param boolean $autoload Autocargamos los datos
      * @param boolean $return_array Solicitamos los datos como un arreglo
      * @return mixed
